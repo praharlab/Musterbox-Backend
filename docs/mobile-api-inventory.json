@@ -1,0 +1,6063 @@
+{
+  "generatedFrom": "Aakar-Backend working tree (branch local, base f2f0eac), 2026-09-23",
+  "companionDocument": "docs/mobile-backend-handover.md",
+  "conventions": {
+    "baseUrl": "REST on port 3000 (no /api prefix); socket.io on port 3210",
+    "authHeader": "Authorization: Bearer <JWT from /auth/v1/mobilelogin>",
+    "envelopes": {
+      "legacy": "{status, message, data, totalcount?} with HTTP 200 even on business errors",
+      "rest": "{message, data, totalcount, page, pageSize} with real HTTP codes",
+      "middlewareDenial": "HTTP 403 {msg:\"Authorization Denied!\"}"
+    },
+    "identitySource": {
+      "token": "user taken from JWT (safe)",
+      "body": "client must send its own userMasterID",
+      "query": "as body, in query string",
+      "path": ":id path param (never scope-checked)",
+      "indexed body": "keys like userMasterID0",
+      "none": "no user identity checked",
+      "mobile": "identified by mobile number"
+    },
+    "userTypes": {
+      "0": "tenant user (employee, manager, HR - differ by role only)",
+      "1": "unused",
+      "2": "super admin (blocked from mobile login)",
+      "3": "sub admin",
+      "4": "dealer"
+    },
+    "readiness": {
+      "READY": "usable as-is",
+      "REVIEW": "exists; needs security/contract fix",
+      "GAP": "backend change required before production use"
+    },
+    "files": "uploads served publicly at ${APIURL}uploads/<subdir>/<file> without auth"
+  },
+  "count": 157,
+  "apis": [
+    {
+      "feature": "auth",
+      "name": "Mobile login",
+      "method": "POST",
+      "endpoint": "/auth/v1/mobilelogin",
+      "authRequired": false,
+      "middleware": [],
+      "userTypes": [
+        0,
+        1,
+        3,
+        4
+      ],
+      "persona": "employee",
+      "identitySource": "none",
+      "request": {
+        "body": {
+          "phone": "string",
+          "password": "string",
+          "firebaseToken": "string?",
+          "uniqueID": "string?",
+          "tracking": "object?"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": {
+          "token": "JWT (365d)",
+          "companyid": "number",
+          "userid": "number",
+          "firstname": "string",
+          "middlename": "string",
+          "lastname": "string",
+          "userNumber": "string",
+          "email": "string",
+          "resetpassword": "0|1",
+          "(top-level) Permission": "rolePermission[] for BirthdayList/WorkAnniversaryList/Chat/HrDashboard"
+        }
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": false,
+      "mobilePhase": "mvp",
+      "readiness": "READY",
+      "notes": "admin=2 blocked. Subscription of parent company must be active. JWT payload {token:{usermasterid}}. No refresh token.",
+      "source": "controllers/auth.controller.js:311",
+      "status": "current"
+    },
+    {
+      "feature": "auth",
+      "name": "Web login",
+      "method": "POST",
+      "endpoint": "/auth/v1/login",
+      "authRequired": false,
+      "middleware": [],
+      "userTypes": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "persona": "employee",
+      "identitySource": "none",
+      "request": {
+        "body": {
+          "phone": "string",
+          "password": "string"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": {
+          "token": "JWT (1d)",
+          "usermasterid": "number",
+          "userName": "string",
+          "userNumber": "string",
+          "email": "string",
+          "admin": "number",
+          "childcompany": "boolean",
+          "companyMasterID": "number",
+          "resetpassword": "0|1"
+        }
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": false,
+      "mobilePhase": "reference",
+      "readiness": "REVIEW",
+      "notes": "Web login; mobile should use /auth/v1/mobilelogin.",
+      "source": "controllers/auth.controller.js:64",
+      "status": "current"
+    },
+    {
+      "feature": "auth",
+      "name": "App bootstrap / version gate",
+      "method": "POST",
+      "endpoint": "/auth/v1/dashboardcheck",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number (alias userid)",
+          "deviceType": "android|ios",
+          "appVersion": "string",
+          "FirebaseToken": "string"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": {
+          "tracking": "boolean",
+          "trackingInterval": "number?",
+          "statusMonitoring": "number?",
+          "expensesubmittedindays": "number",
+          "attendancepolicy": "attendancePolicy row|null",
+          "biometricSerialNo": "string|null",
+          "biometricCode": "string|null",
+          "attendanceFrom": "mobile|biometric|mobileandbiometric|null",
+          "customizeProfileFields": "string[]"
+        }
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Version mismatch -> body status 401 \"Please update app version.\". Saves firebaseToken/deviceType on the BODY user (push hijack risk). Crashes if no AppVersion row for deviceType.",
+      "source": "controllers/auth.controller.js:1227",
+      "status": "current"
+    },
+    {
+      "feature": "auth",
+      "name": "Role permissions",
+      "method": "POST",
+      "endpoint": "/auth/v1/finalcheckpermission",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": {
+          "master": "string[] formName",
+          "data": "[{formName, formMasterID, operationName[]}]",
+          "resultlength": "number"
+        }
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "UI-only; server does not enforce rolePermission.",
+      "source": "controllers/auth.controller.js:1793",
+      "status": "current"
+    },
+    {
+      "feature": "auth",
+      "name": "Forced first-login password change",
+      "method": "POST",
+      "endpoint": "/auth/v1/resetpassword",
+      "authRequired": false,
+      "middleware": [],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "password": "string",
+          "newpassword": "string"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "No auth. Sets resetpassword=0.",
+      "source": "controllers/auth.controller.js:1869",
+      "status": "current"
+    },
+    {
+      "feature": "auth",
+      "name": "Change password",
+      "method": "POST",
+      "endpoint": "/auth/v1/changepassword",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "password": "string",
+          "newpassword": "string"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/auth.controller.js:595",
+      "status": "current"
+    },
+    {
+      "feature": "auth",
+      "name": "Forgot password (email OTP)",
+      "method": "POST",
+      "endpoint": "/auth/v1/forgot",
+      "authRequired": false,
+      "middleware": [],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "mobile",
+      "request": {
+        "body": {
+          "mobile": "string"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": {
+          "otp": "number (LEAKED IN RESPONSE)",
+          "mobile": "string"
+        }
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": false,
+      "mobilePhase": "mvp",
+      "readiness": "GAP",
+      "notes": "Returns the OTP in the response.",
+      "source": "controllers/auth.controller.js:1039",
+      "status": "current"
+    },
+    {
+      "feature": "auth",
+      "name": "Forgot password (SMS OTP, MARS)",
+      "method": "POST",
+      "endpoint": "/auth/v1/forgotpasswordOtpMARS",
+      "authRequired": false,
+      "middleware": [],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "mobile",
+      "request": {
+        "body": {
+          "mobile": "string"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": {
+          "mobile": "string"
+        }
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": false,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "4-digit OTP valid 10 minutes; SMS template is tenant-specific.",
+      "source": "controllers/auth.controller.js:2219",
+      "status": "current"
+    },
+    {
+      "feature": "auth",
+      "name": "Verify SMS OTP",
+      "method": "POST",
+      "endpoint": "/auth/v1/checkPasswordTokenMARS",
+      "authRequired": false,
+      "middleware": [],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "mobile",
+      "request": {
+        "body": {
+          "mobile": "string",
+          "passwordToken": "string"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": {
+          "verified": "boolean"
+        }
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": false,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Does not issue a reset token.",
+      "source": "controllers/auth.controller.js:2287",
+      "status": "current"
+    },
+    {
+      "feature": "auth",
+      "name": "Reset password by mobile",
+      "method": "POST",
+      "endpoint": "/auth/v1/reset",
+      "authRequired": false,
+      "middleware": [],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "mobile",
+      "request": {
+        "body": {
+          "mobile": "string",
+          "new_password": "string"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": false,
+      "mobilePhase": "mvp",
+      "readiness": "GAP",
+      "notes": "CRITICAL: no OTP verification - account takeover.",
+      "source": "controllers/auth.controller.js:1126",
+      "status": "current"
+    },
+    {
+      "feature": "auth",
+      "name": "Logout",
+      "method": "POST",
+      "endpoint": "/auth/v1/userLogout",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Only clears firebaseToken; JWT not revoked.",
+      "source": "controllers/auth.controller.js:2196",
+      "status": "current"
+    },
+    {
+      "feature": "auth",
+      "name": "Birthdays",
+      "method": "GET",
+      "endpoint": "/auth/v1/birthday",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "token",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "READY",
+      "notes": "",
+      "source": "controllers/auth.controller.js:2070",
+      "status": "current"
+    },
+    {
+      "feature": "auth",
+      "name": "Work anniversaries",
+      "method": "GET",
+      "endpoint": "/auth/v1/anniversary",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "token",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "READY",
+      "notes": "",
+      "source": "controllers/auth.controller.js:2087",
+      "status": "current"
+    },
+    {
+      "feature": "app",
+      "name": "App versions",
+      "method": "GET",
+      "endpoint": "/appversion/v1/getalldata",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "none",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "[{appVersionID, deviceType, appVersion}]"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": false,
+      "mobilePhase": "mvp",
+      "readiness": "READY",
+      "notes": "",
+      "source": "routes/appversion.router.js",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Profile summary",
+      "method": "GET",
+      "endpoint": "/auth/v1/profile/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "path",
+      "request": {
+        "params": {
+          "id": "userMasterID"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": {
+          "name": "string",
+          "firstName": "string",
+          "lastName": "string",
+          "userNumber": "string",
+          "email": "string",
+          "dob": "string",
+          "employeeCode": "string",
+          "profile": "photo URL (public)",
+          "isPhotoLock": "number",
+          "companyName": "string",
+          "designation": "string",
+          "department": "string",
+          "branch": "string",
+          "address": "object"
+        }
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": true,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "IDOR: any id.",
+      "source": "controllers/auth.controller.js:638",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Profile summary (company-masked)",
+      "method": "GET",
+      "endpoint": "/auth/v1/getprofileWithCutomizeFields/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "path",
+      "request": {
+        "params": {
+          "id": "userMasterID"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Hidden fields returned as \"-\".",
+      "source": "controllers/auth.controller.js:784",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Update profile photo",
+      "method": "POST",
+      "endpoint": "/auth/v1/editprofile",
+      "authRequired": false,
+      "middleware": [
+        "multer photo"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "multipart": {
+          "photo": "file",
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": true,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "No auth; no type/size filter. Saved to uploads/user/photo.",
+      "source": "controllers/auth.controller.js:1013",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Employment / joining details",
+      "method": "GET",
+      "endpoint": "/empJoining/v1/getbyuserid/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "path",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Includes bank, Aadhaar, PAN. :id not checked by PA.",
+      "source": "controllers/employeeJoiningDetails.controller.js:751",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Profile completion status",
+      "method": "GET",
+      "endpoint": "/empJoining/v1/profileStatus",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "verifyChildParent"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "query",
+      "request": {
+        "query": {
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "[{display, tabName}] + trueCount, falseCount"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/employeeJoiningDetails.controller.js:1895",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Addresses - list",
+      "method": "GET",
+      "endpoint": "/useraddress/v1/getbyuserid/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "path",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Returns full userMaster (password-hash leakage).",
+      "source": "controllers/useraddress.controller.js",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Addresses - add",
+      "method": "POST",
+      "endpoint": "/useraddress/v1/add",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "addressType": "permanent|temporary",
+          "houseNumber": "string",
+          "houseName": "string",
+          "landmark": "string",
+          "area": "string",
+          "cityMasterID": "number",
+          "zipcode": "string",
+          "districtID": "number",
+          "verifyStatus": "0"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Always send verifyStatus 0 and never verifyBy (self-verification possible).",
+      "source": "controllers/useraddress.controller.js",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Family members - list",
+      "method": "GET",
+      "endpoint": "/userfamily/v1/getbyuserid/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "path",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Returns full userMaster (password-hash leakage).",
+      "source": "controllers/userfamily.controller.js",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Family members - add",
+      "method": "POST",
+      "endpoint": "/userfamily/v1/add",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "memberName": "string",
+          "dob": "date",
+          "gender": "string",
+          "relation": "string",
+          "contact": "string",
+          "nominee": "string",
+          "percentForNominee": "number",
+          "verifyStatus": "0"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Always send verifyStatus 0 and never verifyBy (self-verification possible).",
+      "source": "controllers/userfamily.controller.js",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Education - list",
+      "method": "GET",
+      "endpoint": "/usereducation/v1/getbyuserid/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "path",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Returns full userMaster (password-hash leakage).",
+      "source": "controllers/usereducation.controller.js",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Education - add",
+      "method": "POST",
+      "endpoint": "/usereducation/v1/add",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "multer degree"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "multipart": {
+          "userMasterID": "number",
+          "qualification": "string",
+          "yearOfPassing": "string",
+          "grade": "string",
+          "percentageObtained": "string",
+          "institute": "string",
+          "university": "string",
+          "verifyStatus": "0",
+          "degree": "file"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": true,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Always send verifyStatus 0 and never verifyBy (self-verification possible).",
+      "source": "controllers/usereducation.controller.js",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Experience - list",
+      "method": "GET",
+      "endpoint": "/userexperience/v1/getbyuserid/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "path",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Returns full userMaster (password-hash leakage).",
+      "source": "controllers/userexperience.controller.js",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Experience - add",
+      "method": "POST",
+      "endpoint": "/userexperience/v1/add",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "designation": "string",
+          "fromDate": "date",
+          "toDate": "date",
+          "organization": "string",
+          "roleRespo": "string",
+          "verifyStatus": "0"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Always send verifyStatus 0 and never verifyBy (self-verification possible).",
+      "source": "controllers/userexperience.controller.js",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Skills - list",
+      "method": "GET",
+      "endpoint": "/userskills/v1/getbyuserid/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "path",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Returns full userMaster (password-hash leakage).",
+      "source": "controllers/userskills.controller.js",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Skills - add",
+      "method": "POST",
+      "endpoint": "/userskills/v1/add",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "type": "string",
+          "details": "string"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Always send verifyStatus 0 and never verifyBy (self-verification possible).",
+      "source": "controllers/userskills.controller.js",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Personal documents - list",
+      "method": "GET",
+      "endpoint": "/userdocument/v1/getbyuserid/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "path",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": true,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "document is a bare filename -> ${APIURL}uploads/user/document/<file> (public).",
+      "source": "controllers/userdocument.controller.js:260",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Personal documents - add",
+      "method": "POST",
+      "endpoint": "/userdocument/v1/add",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "multer adharPhoto/panPhoto"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "multipart": {
+          "userMasterID": "number",
+          "documentListID": "number",
+          "documentNumber": "string",
+          "nameOnDocument": "string",
+          "expiryDate": "date",
+          "verifyStatus": "0",
+          "adharPhoto": "file (used for every document type)"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": true,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "No type/size filter. verifyStatus 0 creates HR inbox item.",
+      "source": "controllers/userdocument.controller.js:34",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Document types",
+      "method": "POST",
+      "endpoint": "/documentlist/v1/getActiveDocumentTypeData",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "none",
+      "request": {
+        "body": {
+          "limit": "number",
+          "page": "number",
+          "searchQuery": "string"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": false,
+      "mobilePhase": "mvp",
+      "readiness": "READY",
+      "notes": "",
+      "source": "routes/documentlist.router.js",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "My managers",
+      "method": "GET",
+      "endpoint": "/reportto/v1/getbyid/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "path",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "[{userMasterID, companyMasterID, companyName, name, mobile, photo}]"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Not scoped.",
+      "source": "controllers/employeereportto.controller.js:106",
+      "status": "current"
+    },
+    {
+      "feature": "profile",
+      "name": "Face enrolment",
+      "method": "POST",
+      "endpoint": "/empJoining/v1/updateUserFaces",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "multer userFaces x5 jpeg/png 10MB"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "multipart": {
+          "userMasterID": "number",
+          "userFaces": "file[]",
+          "facePhotoArray": "array"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": true,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/employeeJoiningDetails.controller.js:2179",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Today's attendance status",
+      "method": "POST",
+      "endpoint": "/attendanceTransaction/v2/attendancestatus",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": {
+          "In_Data": "{logDateTime, direction, address}|null",
+          "Out_Data": "{logDateTime, direction, address}|null",
+          "(top-level) continuePunchIN": "boolean"
+        }
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/attendancetransaction.controller.js:10630",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Punch in / resume / punch out",
+      "method": "POST",
+      "endpoint": "/attendanceTransaction/v1/attendanceApi",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "direction": "in|out",
+          "newpunchin": "boolean (true = new day)",
+          "attendnaceFrom": "\"mobile\" (misspelled key)",
+          "latitude": "string",
+          "longitude": "string",
+          "address": "string",
+          "photo": "raw base64 or \"\"",
+          "createBy": "number",
+          "createByIp": "string"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "PunchIn successfully. | PunchOut successfully. ; errors in body status 401"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": true,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Server time; geofence via branch/working location radius. SECURITY: body uid (buddy punching); attendnaceFrom \"web\" skips geofence; selfie/face/attendanceFrom not enforced; latest transaction used for out/resume.",
+      "source": "controllers/attendancetransaction.controller.js:169",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Monthly calendar",
+      "method": "POST",
+      "endpoint": "/attendanceTransaction/v1/getcalenderdatamonthwise",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "calendarstartdate": "YYYY-MM-DD",
+          "calendarenddate": "YYYY-MM-DD"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "[{date, title, inTime, outTime, shift, shiftName, shiftInTime, shiftOutTime, shiftHours, inHours, outHours, lateBy, earlyBy, penalty, branchName, otStatus, otAmount, remarks, ...}]"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Alias userid bypasses PA - always use userMasterID.",
+      "source": "controllers/attendancetransaction.controller.js:3978",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Monthly summary",
+      "method": "GET",
+      "endpoint": "/attendanceTransaction/v1/userAttendanceSummary",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "query",
+      "request": {
+        "query": {
+          "startdate": "YYYY-MM-DD",
+          "enddate": "YYYY-MM-DD",
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": {
+          "presentDays": "n",
+          "lateDays": "n",
+          "earlyDays": "n",
+          "absentDays": "n",
+          "leaveDays": "n",
+          "missPunchDays": "n",
+          "weekoffValue": "n",
+          "holidayValue": "n",
+          "totalDaysInMonth": "n",
+          "totalWorkingDays": "n"
+        }
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/attendancetransaction.controller.js:6677",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Attendance history (mobile)",
+      "method": "POST",
+      "endpoint": "/attendanceTransaction/v1/attendanceData",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "startDate": "YYYY-MM-DD|\"\"",
+          "endDate": "YYYY-MM-DD|\"\""
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "No pagination.",
+      "source": "controllers/attendancetransaction.controller.js:1778",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Attendance history (paginated)",
+      "method": "POST",
+      "endpoint": "/attendanceTransaction/v1/attendanceByUserid",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "page": "n",
+          "limit": "n",
+          "startdate": "date",
+          "enddate": "date"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/attendancetransaction.controller.js:1908",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Punch logs of a day",
+      "method": "POST",
+      "endpoint": "/attendanceTransaction/v1/getUserLogDateWise",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "attendanceDate": "YYYY-MM-DD"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/attendancetransaction.controller.js:10809",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Last five days",
+      "method": "POST",
+      "endpoint": "/LastFiveAttendance/v1/getlastfiveattendance",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "VT only - cross-tenant IDOR.",
+      "source": "routes/lastfiveattendance.router.js",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Assigned shifts",
+      "method": "GET",
+      "endpoint": "/employeeshift/v1/getbyuserid/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "path",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "routes/employeeshift.router.js",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Shift detail",
+      "method": "GET",
+      "endpoint": "/shift/v1/getbyid/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "none",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "routes/shift.router.js",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Shift roster",
+      "method": "POST",
+      "endpoint": "/shiftRoster/v1/listShiftRosterData",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "page": "n",
+          "limit": "n",
+          "companyMasterID": "number",
+          "userMasterID": "number",
+          "fromDate": "date",
+          "toDate": "date"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "routes/shiftRoster.router.js",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Regularization reasons",
+      "method": "POST",
+      "endpoint": "/attendanceCorrectionReason/v1/list",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "none",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "READY",
+      "notes": "",
+      "source": "routes/attendanceCorrectionReason.router.js",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Current logs for correction",
+      "method": "GET",
+      "endpoint": "/attendanceCorrection/v1/getAlldata",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "query",
+      "request": {
+        "query": {
+          "userMasterID": "number",
+          "date": "YYYY-MM-DD"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "VT only.",
+      "source": "routes/attendanceCorrection.router.js",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Request regularization",
+      "method": "POST",
+      "endpoint": "/attendanceCorrectionRequest/v1/add",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "AttendanceDate": "date",
+          "remark": "string",
+          "attendaceLogs": "[{logDateTime, direction, attendanceStatus, isChangeLog, shiftID, logId}]",
+          "correctionStatus": "any",
+          "attendanceCorrectionReasonID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "VT only. Sends push screen attendanceCorrectionauth to approvers.",
+      "source": "controllers/attendanceCorrectionRequest.controller.js:39",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "My regularization requests",
+      "method": "POST",
+      "endpoint": "/attendanceCorrectionRequest/v1/getByUserId",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "page": "n",
+          "limit": "n",
+          "userMasterID": "number",
+          "startDate": "date",
+          "endDate": "date",
+          "attendanceCorrectionReasonID": "number?"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/attendanceCorrectionRequest.controller.js:911",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Face match check",
+      "method": "POST",
+      "endpoint": "/empJoining/v1/checkUserFaces",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userFace": "base64",
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Proxies FACE_API_URL; result not bound to punch.",
+      "source": "controllers/employeeJoiningDetails.controller.js:2268",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Background location batch",
+      "method": "POST",
+      "endpoint": "/Tracking/v1/savedatabulk",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "token",
+      "request": {
+        "body": {
+          "tracking": "[{Lattitude, Longitude, Address, Track_datetime, Battery, Gps, Wifi, Mobile_name, type, developerMode, geofence: in|out|offline|gpsOff}]"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "READY",
+      "notes": "Only when dashboardcheck.tracking=true. Client time trusted.",
+      "source": "controllers/tracking.controller.js:85",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Mood check-in",
+      "method": "POST",
+      "endpoint": "/sentimentPunchIn/v1",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "token",
+      "request": {
+        "body": {
+          "mood": "sad|happy|stressed|angry|notSure|ok"
+        }
+      },
+      "response": {
+        "envelope": "rest",
+        "shape": "{message, data, totalcount, page, pageSize}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "READY",
+      "notes": "Once per day; repeat -> HTTP 400.",
+      "source": "controllers/sentimentPunchIn.controller.js:22",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Approved overtime",
+      "method": "POST",
+      "endpoint": "/overTime/v1/getOvertimeDataUserwise",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "fromdate": "date",
+          "todate": "date",
+          "page": "n",
+          "limit": "n"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/overTimeCalculation.controller.js:1003",
+      "status": "current"
+    },
+    {
+      "feature": "attendance",
+      "name": "Pending overtime",
+      "method": "POST",
+      "endpoint": "/overTime/v1/getPendingOvertimedata",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "startDate": "date",
+          "endDate": "date"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/overTimeCalculation.controller.js:684",
+      "status": "current"
+    },
+    {
+      "feature": "leave",
+      "name": "Leave balance",
+      "method": "GET",
+      "endpoint": "/userleave/v1/getUserLeaveBalance",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "query",
+      "request": {
+        "query": {
+          "companyMasterID": "number",
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "[{leaveName, LeaveDesc, LeaveTranId, Leave_CF, LeaveID, Balance}]"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/userleave.controller.js:75",
+      "status": "current"
+    },
+    {
+      "feature": "leave",
+      "name": "Leave types",
+      "method": "GET",
+      "endpoint": "/hrleavetypes/v1/getDataWithoutOutDuty/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "none",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "[{LeaveTranId, LeaveID, LeaveMaster:{LeaveName, LeaveDesc}}]"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "READY",
+      "notes": "",
+      "source": "controllers/hrLeaveTypes.controller.js:724",
+      "status": "current"
+    },
+    {
+      "feature": "leave",
+      "name": "Apply leave",
+      "method": "POST",
+      "endpoint": "/userleave/v2/bulk/add",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "multer attachment x10 (jpeg/png/jpg/pdf, 10MB)",
+        "handleMulterErrors",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "indexed body",
+      "request": {
+        "multipart": {
+          "LeaveTranId{i}": "number",
+          "userMasterID{i}": "number",
+          "companyMasterID{i}": "number",
+          "FromDate{i}": "YYYY-MM-DD",
+          "ToDate{i}": "YYYY-MM-DD",
+          "LeaveDays{i}": "number (0.5 half day)",
+          "DayType{i}": "Full Day|half-day value",
+          "Remark{i}": "string",
+          "isattachment{i}": "yes|no",
+          "createByIp{i}": "string",
+          "attachment": "file[] matched in order to isattachment=yes entries"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": true,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Working tree; live apply endpoint since commit 698a896. New id not returned. Indexed uid not checked by PA.",
+      "source": "controllers/userleave.controller.js:288",
+      "status": "current"
+    },
+    {
+      "feature": "leave",
+      "name": "Leave history",
+      "method": "POST",
+      "endpoint": "/userleave/v2/LeaveByUser",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "page": "n",
+          "limit": "n",
+          "startdate": "date",
+          "enddate": "date",
+          "searchQuery": "string"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "[{UserLeaveApplicationID, FromDate, ToDate, LeaveDays, DayType, Remark, authorizationStatus, attachment, hrLeaveType.LeaveMaster.LeaveName, userLeaveTransactions[], approvedLeaveAuthorizations[]}]"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": true,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "authorizationStatus 0 no approver, 1/2 pending, 3 approved, 4 rejected. Working tree.",
+      "source": "controllers/userleave.controller.js:6015",
+      "status": "current"
+    },
+    {
+      "feature": "leave",
+      "name": "Leave approval trail",
+      "method": "GET",
+      "endpoint": "/leaveauthorizationRequest/v1/getAuthorizationRequestByReferanceId/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "none",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/leaveAuthorization.controller.js:3443",
+      "status": "current"
+    },
+    {
+      "feature": "leave",
+      "name": "My approvers",
+      "method": "GET",
+      "endpoint": "/leaveauthorizationRequest/v1/leaveAuthCriteria/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "path",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "{Auth_Criteria:{Criteria}, Auth_person:[{userMasterID, userName, Number, picture}]}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/leaveAuthorization.controller.js:4727",
+      "status": "current"
+    },
+    {
+      "feature": "leave",
+      "name": "Withdraw leave",
+      "method": "GET",
+      "endpoint": "/userleave/v1/delete/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "none",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "GET with side effect; no owner/status guard.",
+      "source": "controllers/userleave.controller.js:3104",
+      "status": "current"
+    },
+    {
+      "feature": "leave",
+      "name": "Edit leave",
+      "method": "POST",
+      "endpoint": "/userleave/v1/update",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "multer attachment",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "multipart": {
+          "UserLeaveApplicationID": "number",
+          "LeaveTranId": "number",
+          "userMasterID": "number",
+          "companyMasterID": "number",
+          "FromDate": "date",
+          "ToDate": "date",
+          "LeaveDays": "number",
+          "Remark": "string",
+          "DayType": "string",
+          "removeFile": "0|1",
+          "attachment": "file?"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": true,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Resets to pending; no status guard.",
+      "source": "controllers/userleave.controller.js:2401",
+      "status": "current"
+    },
+    {
+      "feature": "leave",
+      "name": "Cancellable approved days",
+      "method": "POST",
+      "endpoint": "/leaveauthorizationRequest/v1/leavecancellist",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "page": "n",
+          "limit": "n",
+          "userMasterID": "number",
+          "companyMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/leaveAuthorization.controller.js:5004",
+      "status": "current"
+    },
+    {
+      "feature": "leave",
+      "name": "Cancel approved day",
+      "method": "POST",
+      "endpoint": "/leaveauthorizationRequest/v1/leavecancel",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userLeaveTransactionID": "number",
+          "LeaveCancelRemark": "string",
+          "updateBy": "number",
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "No approval step.",
+      "source": "controllers/leaveAuthorization.controller.js:5084",
+      "status": "current"
+    },
+    {
+      "feature": "leave",
+      "name": "Employee holiday policy",
+      "method": "GET",
+      "endpoint": "/empholidaypolicy/v1/getbyuserid/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "path",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/employeeHolidayPolicy.controller.js:309",
+      "status": "current"
+    },
+    {
+      "feature": "leave",
+      "name": "Holiday list",
+      "method": "GET",
+      "endpoint": "/holidayspolicy/v1/getbyid/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "none",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "{..., holidayList:[...]}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/holidaypolicy.controller.js:137",
+      "status": "current"
+    },
+    {
+      "feature": "leave",
+      "name": "Optional holidays",
+      "method": "GET",
+      "endpoint": "/userleave/v1/getOptionalLeaveByUserId",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "query",
+      "request": {
+        "query": {
+          "userMasterID": "number",
+          "startDate": "date",
+          "endDate": "date"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/userleave.controller.js:3260",
+      "status": "current"
+    },
+    {
+      "feature": "leave",
+      "name": "Apply short leave",
+      "method": "POST",
+      "endpoint": "/userShortLeave/v1/add",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterIDs": "number[]",
+          "date": "date",
+          "remarks": "string",
+          "type": "string"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "VT only; owners from client.",
+      "source": "controllers/userShortLeave.controller.js:176",
+      "status": "current"
+    },
+    {
+      "feature": "leave",
+      "name": "My short leaves",
+      "method": "POST",
+      "endpoint": "/userShortLeave/v1/listDataByUser",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "page": "n",
+          "limit": "n",
+          "userMasterID": "number",
+          "startDate": "date",
+          "endDate": "date"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/userShortLeave.controller.js:884",
+      "status": "current"
+    },
+    {
+      "feature": "leave",
+      "name": "Comp-off apply",
+      "method": "POST",
+      "endpoint": "/coffMaster/v1/addCoffmasterWithAuthorization",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "companyMasterID": "number",
+          "userMasterID": "number",
+          "LeaveCreatedDate": "date",
+          "YearMM": "YYYYMM",
+          "LeaveAddNew": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/coffMaster.controller.js:529",
+      "status": "current"
+    },
+    {
+      "feature": "leave",
+      "name": "Comp-off list",
+      "method": "GET",
+      "endpoint": "/coffMaster/v1/getCoffDataByUserMasterID",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "query",
+      "request": {
+        "query": {
+          "pageSize": "n",
+          "page": "n",
+          "userMasterID": "number",
+          "fromdate": "date",
+          "todate": "date",
+          "authorizationStatus": "csv"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-pageSize (buggy: limit not applied)"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/coffMaster.controller.js:708",
+      "status": "current"
+    },
+    {
+      "feature": "payslip",
+      "name": "Payslip PDF (main payroll)",
+      "method": "POST",
+      "endpoint": "/salaryTrans/v1/getUserWiseSalarySlip",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "yyyymm": "YYYYMM"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": {
+          "userMasterID": "number",
+          "salaryYYYYMM": "string",
+          "salarySlipIssue": "0|1",
+          "paid": "boolean",
+          "path": "base64 PDF"
+        }
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": true,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Never send status (status \"01\" bypasses publish flag). No month-list endpoint exists.",
+      "source": "controllers/hrSalaryTransaction.controller.js:8318",
+      "status": "current"
+    },
+    {
+      "feature": "payslip",
+      "name": "Payslip list (PaySlip Generator)",
+      "method": "GET",
+      "endpoint": "/paySlipGenerator/v1/getMyPaySlipData",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "token",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "[{yearMonth, payrollFrequency, startDate, endDate, path:\"uploads/PaySlips/<company>/<ms>-<user>.pdf\"}]"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": true,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "READY",
+      "notes": "PDF served publicly at ${APIURL}${path}. No publish flag.",
+      "source": "controllers/paySlipGenerator.controller.js:2018",
+      "status": "current"
+    },
+    {
+      "feature": "payslip",
+      "name": "Form 16 financial years",
+      "method": "GET",
+      "endpoint": "/report/v1/getPreviousfinancialYear",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "none",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "routes/report.router.js:102",
+      "status": "current"
+    },
+    {
+      "feature": "payslip",
+      "name": "Form 16 PDF",
+      "method": "POST",
+      "endpoint": "/report/v1/form16Report",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "financialYear": "YYYY-YYYY"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "base64 PDF in data"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": true,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/report.controller.js:22997",
+      "status": "current"
+    },
+    {
+      "feature": "payslip",
+      "name": "Salary structure",
+      "method": "GET",
+      "endpoint": "/hrSalaryMaster/v1/",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "query",
+      "request": {
+        "query": {
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/hrSalaryMaster.controller.js:476",
+      "status": "current"
+    },
+    {
+      "feature": "payroll",
+      "name": "Advance request",
+      "method": "POST",
+      "endpoint": "/advancePayment/v1/addd",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "description": "string",
+          "amount": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/advancePayment.controller.js:703",
+      "status": "current"
+    },
+    {
+      "feature": "payroll",
+      "name": "My advances",
+      "method": "POST",
+      "endpoint": "/advancePayment/v1/getuserdata",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "page": "n",
+          "limit": "n",
+          "startdate": "date",
+          "enddate": "date",
+          "AdvanceStatus": "0|1|2?"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "Omitting userMasterID returns whole company.",
+      "source": "controllers/advancePayment.controller.js:562",
+      "status": "current"
+    },
+    {
+      "feature": "payroll",
+      "name": "Loan request",
+      "method": "POST",
+      "endpoint": "/loanmaster/v1/addrequest",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "companyMasterID": "number",
+          "userMasterID": "number",
+          "LoanAmount": "number",
+          "LoanRemark": "string",
+          "createBy": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/loanMaster.controller.js:915",
+      "status": "current"
+    },
+    {
+      "feature": "payroll",
+      "name": "My loans",
+      "method": "POST",
+      "endpoint": "/loanmaster/v1/getLoanByUserId",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/loanMaster.controller.js:806",
+      "status": "current"
+    },
+    {
+      "feature": "payroll",
+      "name": "My incentives",
+      "method": "GET",
+      "endpoint": "/employeeincentive/v1/getMyIncentive",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "query",
+      "request": {
+        "query": {
+          "userMasterID": "number",
+          "fromMonth": "YYYYMM",
+          "toMonth": "YYYYMM"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/employeeincentive.controller.js:798",
+      "status": "current"
+    },
+    {
+      "feature": "payroll",
+      "name": "Tax regime",
+      "method": "GET",
+      "endpoint": "/employeeTaxRegime/v1/getByUserId",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "query",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/employeeTaxRegime.controller.js:776",
+      "status": "current"
+    },
+    {
+      "feature": "payroll",
+      "name": "Investment declaration submit",
+      "method": "POST",
+      "endpoint": "/employeeDeclaration/v1/add",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "multer attachments x10 10MB"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": true,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "Never send declarationFrom (self-approves).",
+      "source": "controllers/employeeDeclaration.controller.js:48",
+      "status": "current"
+    },
+    {
+      "feature": "notifications",
+      "name": "Action inbox",
+      "method": "GET",
+      "endpoint": "/userInbox/v1/getUserInboxData",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "verifyChildParent"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "token",
+      "request": {
+        "query": {
+          "page": "n",
+          "limit": "n",
+          "type": "activityTable?",
+          "startdate": "date?",
+          "enddate": "date?"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "[{id, activityTable, activityTablePK, message, companyMasterID, assignedTo, assignedBy, createdAt}]"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "READY",
+      "notes": "No read/unread; rows deleted when request is decided.",
+      "source": "controllers/userInbox.controller.js:151",
+      "status": "current"
+    },
+    {
+      "feature": "notifications",
+      "name": "Announcements feed",
+      "method": "POST",
+      "endpoint": "/announcement/v1/getbyuserId",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "page": "n",
+          "limit": "n"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": true,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Marks ALL unread as read. No totalcount. Attachment at /uploads/announcement/<file>.",
+      "source": "controllers/announcement.controller.js:528",
+      "status": "current"
+    },
+    {
+      "feature": "notifications",
+      "name": "Unread announcements count",
+      "method": "POST",
+      "endpoint": "/announcement/v1/countUnreadAnnouncement",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "number"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/announcement.controller.js:601",
+      "status": "current"
+    },
+    {
+      "feature": "documents",
+      "name": "HR-issued documents",
+      "method": "POST",
+      "endpoint": "/compdoc/v1/getbyuserid",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "page": "n",
+          "limit": "n"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": true,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "File at /uploads/company/document/<document> (public).",
+      "source": "controllers/companydocument.controller.js:149",
+      "status": "current"
+    },
+    {
+      "feature": "documents",
+      "name": "Policy documents",
+      "method": "GET",
+      "endpoint": "/policyDocument/v1",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "verifyChildParent"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "token",
+      "request": {},
+      "response": {
+        "envelope": "rest",
+        "shape": "{message, data, totalcount, page, pageSize}"
+      },
+      "pagination": {
+        "type": "page-pageSize",
+        "request": [
+          "page",
+          "pageSize"
+        ],
+        "response": [
+          "totalcount",
+          "page",
+          "pageSize"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": true,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Do not send companyMasterID (overrides tenant filter).",
+      "source": "controllers/policyDocument.controller.js:110",
+      "status": "current"
+    },
+    {
+      "feature": "documents",
+      "name": "Policy document detail",
+      "method": "GET",
+      "endpoint": "/policyDocument/v1/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "verifyChildParent"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "token",
+      "request": {},
+      "response": {
+        "envelope": "rest",
+        "shape": "{message, data, totalcount, page, pageSize}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/policyDocument.controller.js:78",
+      "status": "current"
+    },
+    {
+      "feature": "documents",
+      "name": "My letters",
+      "method": "POST",
+      "endpoint": "/userLetters/v1/getAllUserLetter",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "[{label, path, htmlContent}]"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": true,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "VT only - cross-tenant IDOR; PDFs at predictable public URLs /uploads/letter/<type>_<userMasterID>.pdf.",
+      "source": "controllers/userLetters.controller.js:29",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "My team (direct reports + today attendance)",
+      "method": "GET",
+      "endpoint": "/reportTo/v1/reportstoImmediateChild",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "query",
+      "request": {
+        "query": {
+          "userMasterID": "number",
+          "date": "YYYY-MM-DD",
+          "search": "string",
+          "page": "n",
+          "limit": "n"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "{currentUser, child:[{reportToID, userMasterID, employee:{displayName, photo, employeeDesignations, employeeDepartments, employeeBranches, attendanceTransactions}}]} + childCount"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "VT only; not scoped.",
+      "source": "controllers/reportTo.controller.js:2808",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Team tree",
+      "method": "GET",
+      "endpoint": "/reportTo/v1/reportsto/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "path",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/reportTo.controller.js:679",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Team attendance today",
+      "method": "GET",
+      "endpoint": "/reportTo/v1/reportstowithoutchild/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "path",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/reportTo.controller.js:1113",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Team attendance by date",
+      "method": "POST",
+      "endpoint": "/reportTo/v1/reportstowithoutchilddatewise",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "AttendanceDate": "YYYY-MM-DD"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/reportTo.controller.js:2433",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Pending counts (leave/OT/expense)",
+      "method": "POST",
+      "endpoint": "/leaveauthorizationRequest/v1/countpending",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "{leaveCount, OTcount, expenseAuthorizationsCount, ...approve/rejected counts}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "No try/catch.",
+      "source": "controllers/leaveAuthorization.controller.js:93",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Do I approve anyone",
+      "method": "POST",
+      "endpoint": "/AuthorizationDetails/v1/getAuthList",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/authorizationDetails.controller.js:4189",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Pending leave approvals",
+      "method": "POST",
+      "endpoint": "/leaveauthorizationRequest/v2/listLeaveAuthRequestNew",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "approver id",
+          "status": "2 = pending",
+          "page": "n",
+          "limit": "n",
+          "startdate": "date",
+          "enddate": "date",
+          "user": "number[]"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/leaveAuthorization.controller.js:893",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Leave day breakdown",
+      "method": "GET",
+      "endpoint": "/leaveauthorizationRequest/v1/leavedetails/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "none",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "{finaldate, leavebalance, sandwichdate, leavedata}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/leaveAuthorization.controller.js:3706",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Approve / reject leave",
+      "method": "POST",
+      "endpoint": "/leaveauthorizationRequest/v1/authorizationacceptreject",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "none (not checked)",
+      "request": {
+        "body": {
+          "AuthorizationRequestId": "number",
+          "ReferenceID": "number",
+          "authstatus": "1 approve | 0 reject",
+          "rejectionRemarks": "string",
+          "leavetransaction": "[{ReferenceID, userMasterID, LeaveTranId, days, date, issandwichleave}] (approve)"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "GAP",
+      "notes": "CRITICAL: no approver check; client-built breakdown trusted.",
+      "source": "controllers/leaveAuthorization.controller.js:1491",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Pending short leaves",
+      "method": "POST",
+      "endpoint": "/shortLeaveAuthorization/v1/listShortLeaveAuthRequest",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "approver id",
+          "status": "2"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/shortLeaveAuthorization.controller.js:205",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Decide short leave",
+      "method": "POST",
+      "endpoint": "/shortLeaveAuthorization/v1/shortLeaveAcceptReject",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "none (not checked)",
+      "request": {
+        "body": {
+          "id": "number",
+          "authstatus": "1|0",
+          "remarks": "string"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "GAP",
+      "notes": "",
+      "source": "controllers/shortLeaveAuthorization.controller.js:443",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Pending comp-offs",
+      "method": "POST",
+      "endpoint": "/compensatoryOffAuthorizationRequest/viewcompensatoryOffAuthorizationByUserId",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/compensatoryOffAuthorization.controller.js:359",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Decide comp-off",
+      "method": "POST",
+      "endpoint": "/compensatoryOffAuthorizationRequest/compensatoryOffAuthorizationacceptreject",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "CompensatoryOffAuthorizationID": "number",
+          "remarks": "string",
+          "authstatus": "1|0",
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "GAP",
+      "notes": "",
+      "source": "controllers/compensatoryOffAuthorization.controller.js:34",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Pending regularizations",
+      "method": "POST",
+      "endpoint": "/attendanceCorrectionAuthorization/listAttendaceAuthorization",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "limit": "n",
+          "page": "n",
+          "startdate": "date",
+          "enddate": "date",
+          "userMasterID": "approver id",
+          "user": "number[]",
+          "status": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/attendanceCorrectionAuthorization.controller.js:607",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Decide regularization",
+      "method": "POST",
+      "endpoint": "/attendanceCorrectionAuthorization/attendancecorrectionauthorizationrequest",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "id": "number",
+          "remarks": "string",
+          "authstatus": "1|0",
+          "attendanceCorrectionRequestId": "number",
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "GAP",
+      "notes": "",
+      "source": "controllers/attendanceCorrectionAuthorization.controller.js:53",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Pending gate passes",
+      "method": "POST",
+      "endpoint": "/gatepassauthorization/gatepassauthorizationrequest",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "approver id",
+          "status": "2|1|0",
+          "user": "number[]",
+          "startdate": "date",
+          "enddate": "date",
+          "page": "n",
+          "limit": "n"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/gatePassAuthorization.controller.js:195",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Decide gate pass",
+      "method": "POST",
+      "endpoint": "/gatepassauthorization/authorizationacceptreject",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "AuthorizationRequestId": "number",
+          "ReferenceID": "number",
+          "authstatus": "number 1|0",
+          "remarks": "string",
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "GAP",
+      "notes": "",
+      "source": "controllers/gatePassAuthorization.controller.js:26",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Pending overtime",
+      "method": "POST",
+      "endpoint": "/authorizationRequest/v1/viewauthorizationrequestbyuseridforovertime",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "authuser": "approver id"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/authorizationRequest.controller.js:655",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Decide overtime",
+      "method": "POST",
+      "endpoint": "/authorizationRequest/v1/authorizationacceptrejectovertime",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "AuthorizationRequestId": "number",
+          "ReferenceID": "number",
+          "authstatus": "1|0",
+          "remarks": "string",
+          "createBy": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "GAP",
+      "notes": "",
+      "source": "controllers/authorizationRequest.controller.js:1100",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Pending expenses",
+      "method": "POST",
+      "endpoint": "/authorizationRequest/v3/getExpenseAuthByUser",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/authorizationRequest.controller.js:4387",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Decide expenses",
+      "method": "POST",
+      "endpoint": "/authorizationRequest/v1/authorizationacceptrejectexpenseall",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "token",
+      "request": {
+        "body": {
+          "authstatus": "1|0",
+          "newArray": "[{userexpensetransactionid, authorizationrequestid, remarks?}]"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "Actor from token but row approver not verified.",
+      "source": "controllers/authorizationRequest.controller.js:2833",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Pending extra days",
+      "method": "POST",
+      "endpoint": "/extraDaysAuthorization/v1/viewExtraDayAuthorizationByUserId",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/extraDaysAuthorization.controller.js:287",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Decide extra days",
+      "method": "POST",
+      "endpoint": "/extraDaysAuthorization/v1/extraDaysAuthorizationacceptreject",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "GAP",
+      "notes": "",
+      "source": "controllers/extraDaysAuthorization.controller.js:483",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Pending resignations",
+      "method": "POST",
+      "endpoint": "/resignation/v1/getAll",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/resignation.controller.js:403",
+      "status": "current"
+    },
+    {
+      "feature": "manager",
+      "name": "Decide resignation",
+      "method": "POST",
+      "endpoint": "/resignation/resignationAuthorizationacceptreject",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "ResignationAuthorizationRequestId": "number",
+          "authstatus": "1|0",
+          "remarks": "string",
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "GAP",
+      "notes": "",
+      "source": "controllers/resignation.controller.js:1262",
+      "status": "current"
+    },
+    {
+      "feature": "tasks",
+      "name": "My tasks",
+      "method": "POST",
+      "endpoint": "/user_tasks/v3/getTaskbyUser",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "taskstatus": "0|1|2|3?",
+          "tasks_stagesID": "number?",
+          "startDate": "date?",
+          "endDate": "date?",
+          "searchQuery": "string?",
+          "page": "n",
+          "limit": "n"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/User_Tasks.controller.js:1708",
+      "status": "current"
+    },
+    {
+      "feature": "tasks",
+      "name": "Accept / reject task",
+      "method": "POST",
+      "endpoint": "/user_tasks/v1/TaskAcceptReject",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "none",
+      "request": {
+        "body": {
+          "user_TasksID": "number",
+          "status": "1 accept | 2 reject"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "No assignee check.",
+      "source": "controllers/User_Tasks.controller.js:760",
+      "status": "current"
+    },
+    {
+      "feature": "tasks",
+      "name": "Advance task stage",
+      "method": "POST",
+      "endpoint": "/user_tasks/v2/postUpdateTaskStage",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "none",
+      "request": {
+        "body": {
+          "user_TasksID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "May not respond when no next stage.",
+      "source": "controllers/User_Tasks.controller.js:1126",
+      "status": "current"
+    },
+    {
+      "feature": "tasks",
+      "name": "Next stage",
+      "method": "GET",
+      "endpoint": "/user_tasks/v1/getNextStageById/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "none",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/User_Tasks.controller.js:586",
+      "status": "current"
+    },
+    {
+      "feature": "tasks",
+      "name": "Task counts",
+      "method": "POST",
+      "endpoint": "/user_tasks/v1/getTaskReport",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "startDate": "date",
+          "endDate": "date"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}",
+        "data": "{pending, accepted, rejected, completed}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/User_Tasks.controller.js:825",
+      "status": "current"
+    },
+    {
+      "feature": "tasks",
+      "name": "Assign task",
+      "method": "POST",
+      "endpoint": "/user_tasks/v2/add",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "multer attachment x10 (jpeg/png/jpg/pdf/doc/docx, 10MB)",
+        "handleMulterErrors",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "token (createBy)",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": true,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "READY",
+      "notes": "Indexed fields per task: taskDataType{i}, userMasterID{i}, TaskName{i}, TaskDesc{i}, priority{i}, startDate{i}, startTime{i}, endDate{i}, allTaskStage{i}, taskWeightage{i}, companyMasterID{i}, hasSubTask{i}, isattachment{i}.",
+      "source": "controllers/User_Tasks.controller.js:884",
+      "status": "current"
+    },
+    {
+      "feature": "tasks",
+      "name": "Tasks I assigned",
+      "method": "POST",
+      "endpoint": "/user_tasks/v2/getTaskbyCompany",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "token (createBy)",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "READY",
+      "notes": "",
+      "source": "controllers/User_Tasks.controller.js:2038",
+      "status": "current"
+    },
+    {
+      "feature": "tasks",
+      "name": "Send reminder",
+      "method": "POST",
+      "endpoint": "/Tasks_Stages/v1/send-reminder",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "token (sender)",
+      "request": {
+        "body": {
+          "user_TasksID": "number",
+          "userMasterID": "receiver",
+          "TaskName": "string",
+          "message": "string"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "mvp",
+      "readiness": "READY",
+      "notes": "",
+      "source": "controllers/tasks_stages.controller.js:549",
+      "status": "current"
+    },
+    {
+      "feature": "tasks",
+      "name": "Task remarks",
+      "method": "POST",
+      "endpoint": "/taskRemark/v1/postAddTaskRemark",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "remark": "string",
+          "tasks_stagesID": "number",
+          "user_TasksID": "number",
+          "createBy": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/taskremark.controller.js:12",
+      "status": "current"
+    },
+    {
+      "feature": "tasks",
+      "name": "Daily report submit",
+      "method": "POST",
+      "endpoint": "/dailyTask/v2/add",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "multer attachment x10"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": true,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/dailyTask.controller.js:229",
+      "status": "current"
+    },
+    {
+      "feature": "expenses",
+      "name": "Submit expense",
+      "method": "POST",
+      "endpoint": "/userExpense/v2/add",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "multer attachFile x40 (jpeg/png/jpg/pdf, 10MB)"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "token",
+      "request": {
+        "multipart": {
+          "expense_date": "YYYY-MM-DD",
+          "visitID": "number?",
+          "ToursMasterID": "number?",
+          "projectID": "number?",
+          "expenseHeadId{i}": "number",
+          "expenseAmount{i}": "number",
+          "description{i}": "string",
+          "expensePriceRuleID{i}": "number?",
+          "isattachment_{i}..isattachment4_{i}": "true|false",
+          "attachFile": "file[]"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": true,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "READY",
+      "notes": "",
+      "source": "controllers/userExpense.controller.js:1421",
+      "status": "current"
+    },
+    {
+      "feature": "expenses",
+      "name": "My expense vouchers",
+      "method": "POST",
+      "endpoint": "/userExpense/v3/userExpenseNew",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "token",
+      "request": {
+        "body": {
+          "fromDate": "date",
+          "toDate": "date",
+          "expenseType": "string",
+          "page": "n",
+          "limit": "n"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "READY",
+      "notes": "",
+      "source": "controllers/userExpense.controller.js:2642",
+      "status": "current"
+    },
+    {
+      "feature": "expenses",
+      "name": "Expense detail",
+      "method": "POST",
+      "endpoint": "/userExpense/v1/userExpenseByID",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "none",
+      "request": {
+        "body": {
+          "userExpenseID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "No ownership check.",
+      "source": "controllers/userExpense.controller.js:2871",
+      "status": "current"
+    },
+    {
+      "feature": "expenses",
+      "name": "Edit expense",
+      "method": "POST",
+      "endpoint": "/userExpense/v1/updatebyUserExpenseID",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "multer attachFile"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": true,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "Never send filesTobeRemoved outside own files (arbitrary unlink).",
+      "source": "controllers/userExpense.controller.js:3146",
+      "status": "current"
+    },
+    {
+      "feature": "expenses",
+      "name": "Reapply rejected line",
+      "method": "POST",
+      "endpoint": "/userExpense/v2/reapply",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "multer attachFile"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": true,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/userExpense.controller.js:2302",
+      "status": "current"
+    },
+    {
+      "feature": "visits",
+      "name": "My visits",
+      "method": "POST",
+      "endpoint": "/visit/v1/getVisitByUserID",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "page": "n",
+          "limit": "n",
+          "date": "date (required)",
+          "toDate": "date?"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/visit.controller.js:759",
+      "status": "current"
+    },
+    {
+      "feature": "visits",
+      "name": "Create visit",
+      "method": "POST",
+      "endpoint": "/visit/v1/add",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "customerID": "number",
+          "assignID": "number",
+          "coPersonID": "string[]",
+          "visitPurposeID": "number",
+          "productID": "number",
+          "visitDate": "date",
+          "visitTime": "string",
+          "companyMasterID": "number",
+          "createBy": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/visit.controller.js:52",
+      "status": "current"
+    },
+    {
+      "feature": "visits",
+      "name": "Visit check-in / check-out",
+      "method": "POST",
+      "endpoint": "/visit/v1/updatebyid",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "visitID": "number",
+          "checkInDateTime": "datetime",
+          "checkInLatitude": "number",
+          "checkInLongitude": "number",
+          "checkInLocation": "string",
+          "checkOutDateTime": "datetime",
+          "checkOutLatitude": "number",
+          "checkOutLongitude": "number",
+          "checkOutLocation": "string",
+          "updateBy": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "Client time and coordinates trusted.",
+      "source": "controllers/visit.controller.js:185",
+      "status": "current"
+    },
+    {
+      "feature": "visits",
+      "name": "Visit detail",
+      "method": "GET",
+      "endpoint": "/visit/v1/getbyid/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "none",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/visit.controller.js:129",
+      "status": "current"
+    },
+    {
+      "feature": "visits",
+      "name": "Team visits",
+      "method": "POST",
+      "endpoint": "/visit/v1/Team_Visit",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "manager",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "GAP",
+      "notes": "No scope; omitting userMasterID returns every tenant.",
+      "source": "controllers/visit.controller.js:3699",
+      "status": "current"
+    },
+    {
+      "feature": "visits",
+      "name": "Customers",
+      "method": "POST",
+      "endpoint": "/customer/v1/getalldata",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "routes/customer.router.js",
+      "status": "current"
+    },
+    {
+      "feature": "visits",
+      "name": "Visit purposes",
+      "method": "POST",
+      "endpoint": "/visitpurpose/v1/getalldata",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "routes/visitpurpose.router.js",
+      "status": "current"
+    },
+    {
+      "feature": "gatepass",
+      "name": "Apply gate pass",
+      "method": "POST",
+      "endpoint": "/employeeGatepass/addmygatepass",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "joi",
+        "verifyChildParent"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "description": "string",
+          "date": "ISO date",
+          "fromTime": "HH:mm",
+          "toTime": "HH:mm",
+          "status": "\"Pending\"",
+          "purposeFor": "Company|Personal",
+          "userMasterID": "number",
+          "companyMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "rest",
+        "shape": "{message, data, totalcount, page, pageSize}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/employeeGatepass.controller.js:42",
+      "status": "current"
+    },
+    {
+      "feature": "gatepass",
+      "name": "My gate passes",
+      "method": "GET",
+      "endpoint": "/employeeGatepass/v1",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "joi",
+        "verifyChildParent"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "query",
+      "request": {},
+      "response": {
+        "envelope": "rest",
+        "shape": "{message, data, totalcount, page, pageSize}"
+      },
+      "pagination": {
+        "type": "page-pageSize",
+        "request": [
+          "page",
+          "pageSize"
+        ],
+        "response": [
+          "totalcount",
+          "page",
+          "pageSize"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "status filter = authorizationStatus csv.",
+      "source": "controllers/employeeGatepass.controller.js:501",
+      "status": "current"
+    },
+    {
+      "feature": "gatepass",
+      "name": "Gate pass check-out/in selfie",
+      "method": "POST",
+      "endpoint": "/employeeGatepass/v1/update",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "verifyChildParent",
+        "multer attachment x1 (jpeg/png, 10MB)"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "multipart": {
+          "employeeGatepassId": "number",
+          "type": "Checkout|Checkin|FinalCheckin",
+          "time": "HH:mm",
+          "address": "string",
+          "attachment": "file"
+        }
+      },
+      "response": {
+        "envelope": "rest",
+        "shape": "{message, data, totalcount, page, pageSize}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": true,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/employeeGatepass.controller.js:354",
+      "status": "current"
+    },
+    {
+      "feature": "gatepass",
+      "name": "Gate pass approval timeline",
+      "method": "GET",
+      "endpoint": "/gatepassauthorization/gatepassrequestdatabyid/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "none",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/gatePassAuthorization.controller.js:400",
+      "status": "current"
+    },
+    {
+      "feature": "assets",
+      "name": "My assets",
+      "method": "POST",
+      "endpoint": "/assignasset/v1/getbyUserID",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "userMasterID": "number",
+          "page": "n",
+          "limit": "n"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/assignassettoemp.controller.js:568",
+      "status": "current"
+    },
+    {
+      "feature": "helpdesk",
+      "name": "My tickets",
+      "method": "GET",
+      "endpoint": "/ticket/v1",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "verifyChildParent"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "token",
+      "request": {},
+      "response": {
+        "envelope": "rest",
+        "shape": "{message, data, totalcount, page, pageSize}"
+      },
+      "pagination": {
+        "type": "page-pageSize",
+        "request": [
+          "page",
+          "pageSize"
+        ],
+        "response": [
+          "totalcount",
+          "page",
+          "pageSize"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "READY",
+      "notes": "",
+      "source": "controllers/ticket.controller.js:325",
+      "status": "current"
+    },
+    {
+      "feature": "helpdesk",
+      "name": "Ticket detail",
+      "method": "GET",
+      "endpoint": "/ticket/v1/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "verifyChildParent"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "token",
+      "request": {},
+      "response": {
+        "envelope": "rest",
+        "shape": "{message, data, totalcount, page, pageSize}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "READY",
+      "notes": "",
+      "source": "controllers/ticket.controller.js:268",
+      "status": "current"
+    },
+    {
+      "feature": "helpdesk",
+      "name": "Raise ticket",
+      "method": "POST",
+      "endpoint": "/ticket/v1",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "verifyChildParent",
+        "multer attachments x5 (jpeg/png/mp4, 10MB)"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "token",
+      "request": {
+        "multipart": {
+          "title": "string",
+          "description": "string",
+          "ticketCategoryId": "number",
+          "ticketSubCategoryId": "number?",
+          "attachments": "file[]"
+        }
+      },
+      "response": {
+        "envelope": "rest",
+        "shape": "{message, data, totalcount, page, pageSize}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": true,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "READY",
+      "notes": "",
+      "source": "controllers/ticket.controller.js:31",
+      "status": "current"
+    },
+    {
+      "feature": "helpdesk",
+      "name": "Ticket categories",
+      "method": "GET",
+      "endpoint": "/ticketCategory/v1",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "verifyChildParent"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "token",
+      "request": {},
+      "response": {
+        "envelope": "rest",
+        "shape": "{message, data, totalcount, page, pageSize}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "READY",
+      "notes": "",
+      "source": "routes/ticketCategory.router.js",
+      "status": "current"
+    },
+    {
+      "feature": "feedback",
+      "name": "Anonymous feedback",
+      "method": "POST",
+      "endpoint": "/anonymousFeedback/v1/add",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "body": {
+          "feedback": "string",
+          "userMasterID": "number"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "Author ID is stored.",
+      "source": "controllers/anonymousFeedback.controller.js:10",
+      "status": "current"
+    },
+    {
+      "feature": "performance",
+      "name": "My goals",
+      "method": "GET",
+      "endpoint": "/employeeGoal/v1",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "verifyChildParent"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "query",
+      "request": {},
+      "response": {
+        "envelope": "rest",
+        "shape": "{message, data, totalcount, page, pageSize}"
+      },
+      "pagination": {
+        "type": "page-pageSize",
+        "request": [
+          "page",
+          "pageSize"
+        ],
+        "response": [
+          "totalcount",
+          "page",
+          "pageSize"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/employeeGoal.controller.js:239",
+      "status": "current"
+    },
+    {
+      "feature": "performance",
+      "name": "Update goal progress",
+      "method": "PUT",
+      "endpoint": "/employeeGoal/v1/:id",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "verifyChildParent"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "none",
+      "request": {},
+      "response": {
+        "envelope": "rest",
+        "shape": "{message, data, totalcount, page, pageSize}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "No owner check.",
+      "source": "controllers/employeeGoal.controller.js:98",
+      "status": "current"
+    },
+    {
+      "feature": "performance",
+      "name": "Reviews (as reviewer or reviewee)",
+      "method": "GET",
+      "endpoint": "/employeePerformanceReview/v1",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "verifyChildParent"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "query",
+      "request": {},
+      "response": {
+        "envelope": "rest",
+        "shape": "{message, data, totalcount, page, pageSize}"
+      },
+      "pagination": {
+        "type": "page-pageSize",
+        "request": [
+          "page",
+          "pageSize"
+        ],
+        "response": [
+          "totalcount",
+          "page",
+          "pageSize"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/employeePerformanceReview.controller.js:232",
+      "status": "current"
+    },
+    {
+      "feature": "performance",
+      "name": "Submit review answers",
+      "method": "POST",
+      "endpoint": "/reviewFormAnswer/v1",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "rest",
+        "shape": "{message, data, totalcount, page, pageSize}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "GAP",
+      "notes": "Overwrites any answer by id (cross-tenant).",
+      "source": "controllers/reviewFormAnswer.controller.js:20",
+      "status": "current"
+    },
+    {
+      "feature": "training",
+      "name": "Trainings",
+      "method": "POST",
+      "endpoint": "/companyTraining/v1/listdata",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "GAP",
+      "notes": "Leaks password hashes; omitting companyMasterID returns all tenants.",
+      "source": "controllers/companyTraining.controller.js:63",
+      "status": "current"
+    },
+    {
+      "feature": "training",
+      "name": "My skill forms",
+      "method": "POST",
+      "endpoint": "/monthlySkillsetsform/v1/getbyuserid",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/monthlySkillsetsform.controller.js:340",
+      "status": "current"
+    },
+    {
+      "feature": "resignation",
+      "name": "Apply resignation",
+      "method": "POST",
+      "endpoint": "/resignation/v1/add",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "permissionAccess",
+        "multer attachment (no limits)"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": true,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/resignation.controller.js:106",
+      "status": "current"
+    },
+    {
+      "feature": "chat",
+      "name": "Send chat message",
+      "method": "POST",
+      "endpoint": "/userchats/v1/postSendMessage",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken",
+        "multer path"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {
+        "multipart": {
+          "senderID": "number",
+          "receiverID": "number",
+          "message": "string",
+          "msgstatus": "number",
+          "path": "file?"
+        }
+      },
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": true,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "Trusts client sender/receiver.",
+      "source": "controllers/userChats.controller.js:24",
+      "status": "current"
+    },
+    {
+      "feature": "chat",
+      "name": "Chat list",
+      "method": "POST",
+      "endpoint": "/userchats/v1/getuserList",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "none"
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "GAP",
+      "notes": "SQL injection via receiverID; leaks password hashes.",
+      "source": "controllers/userChats.controller.js:93",
+      "status": "current"
+    },
+    {
+      "feature": "chat",
+      "name": "Chat thread",
+      "method": "POST",
+      "endpoint": "/userchats/v1/getuserWiseChat",
+      "authRequired": true,
+      "middleware": [
+        "verifyToken"
+      ],
+      "userTypes": [
+        0
+      ],
+      "persona": "employee",
+      "identitySource": "body",
+      "request": {},
+      "response": {
+        "envelope": "legacy",
+        "shape": "{status, message, data, totalcount?}"
+      },
+      "pagination": {
+        "type": "page-limit",
+        "request": [
+          "page",
+          "limit"
+        ],
+        "response": [
+          "totalcount"
+        ]
+      },
+      "fileUpload": false,
+      "fileDownload": false,
+      "tenantScoped": true,
+      "mobilePhase": "phase2",
+      "readiness": "REVIEW",
+      "notes": "",
+      "source": "controllers/userChats.controller.js:298",
+      "status": "current"
+    }
+  ]
+}

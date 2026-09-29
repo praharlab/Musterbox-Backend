@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portrait Asopalav Employee ID Card</title>
+  <link rel="stylesheet" href="/css/bootstrap.css" />
+  <!-- <link rel="stylesheet" href="./bootstrap.css" /> -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif !important;
+      letter-spacing: 0;
+      font-weight: 1000 !important;
+    }
+
+    .id-card {
+      width: 400px !important;
+      height: 620px !important;
+      overflow: hidden;
+      box-sizing: border-box;
+      flex-direction: row;
+      position: relative;
+    }
+
+    .id-card .header {
+      background-color: #00512c;
+      color: white;
+      text-align: center;
+      height: 140px;
+      width: 402px !important;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding-bottom: 5px !important;
+    }
+
+    .id-card .header img {
+      width: 50%;
+    }
+
+    .profile-pic {
+      /* height: 130px;
+      width: 130px; */
+      height: 170px;
+      width: 150px;
+      min-width: 140px;
+      border-radius: 8px;
+      background-color: #ebfcdc;
+      color: #00853e;
+      font-size: 32px;
+      font-weight: bold;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .id-card .footer {
+      background-color: #00512c;
+      color: white;
+      position: absolute;
+      width: 100%;
+      /* padding: 5px; */
+      text-align: center;
+      bottom: 0px;
+    }
+
+    .footer_text {
+      margin-top: 3px;
+    }
+
+    .id-card .footer .footer_text {
+      font-size: 24px;
+      color: #fff;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    table {
+      border-collapse: collapse;
+      border-spacing: 0;
+    }
+
+    td {
+      margin: 0;
+      /* padding: 2px 0px !important; */
+      font-size: 18px !important;
+      width: fit-content !important;
+      border: none;
+    }
+
+    .signatureImage {
+      width: 60px;
+      rotate: 15deg;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .mt5 {
+      margin-top: 5px;
+    }
+
+    /* .mt10 {
+      margin-top: 20px;
+    } */
+
+    .fs17 {
+      font-size: 17px;
+    }
+
+    .fwnormal {
+      font-weight: normal;
+    }
+
+    .ml20 {
+      margin-left: 20px !important;
+    }
+
+    .pr10 {
+      padding-right: 10px !important;
+    }
+
+    .d-flex {
+      display: flex !important;
+    }
+
+    .justify-content-center {
+      justify-content: center !important;
+    }
+
+    .justify-content-end {
+      justify-content: end !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="row" #screen>
+    {{#each tempData}}
+    <div class="col-4">
+      <div class="col-12">
+        <div class="id-card">
+          <div class="header">
+            <img src="{{this.ApiURL}}css/assets/asopalavlogo.png" alt="Company Logo" />
+          </div>
+          <div>
+            <div class="w-100 d-flex justify-content-center mt5" style="margin-top: 10px !important;">
+              {{#if this.idCardData.userPhoto}}
+              <img class="profile-pic" src="{{this.ApiURL}}uploads/user/photo/{{ this.idCardData.userPhoto }}" alt="" />
+              {{else}}
+              <div class="profile-pic">
+                {{this.idCardData.profilePicName}}
+              </div>
+              {{/if}}
+            </div>
+            <div>
+              <table class="ml20 mt5" style="margin-top: 10px !important;">
+                <tr>
+                  <td style="padding: 4px 2px !important;"><b>Name</b></td>
+                  <td style="padding: 4px 2px !important;">&nbsp;:&nbsp;</td>
+                  <td style="padding: 4px 2px !important;"><span><b>{{ this.idCardData.userFirstName }}
+                        {{this.idCardData.userLastName }}</b></span></td>
+                </tr>
+                <tr>
+                  <td style="padding: 3px 2px !important;"><b>Designation</b></td>
+                  <td style="padding: 3px 2px !important;">&nbsp;:&nbsp;</td>
+                  <td style="padding: 3px 2px !important;"><span> <b>{{ this.idCardData.designationName }}</b></span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 3px 2px !important;"><b>Department</b></td>
+                  <td style="padding: 3px 2px !important;">&nbsp;:&nbsp;</td>
+                  <td style="padding: 3px 2px !important;"><span><b>{{ this.idCardData.departmentName }}</b></span></td>
+                </tr>
+                <tr>
+                  <td style="padding: 3px 2px !important;"><b>Branch</b></td>
+                  <td style="padding: 3px 2px !important;">&nbsp;:&nbsp;</td>
+                  <td style="padding: 3px 2px !important;"><span> <b>{{ this.idCardData.branchName }}</b></span></td>
+                </tr>
+                <tr>
+                  <td style="padding: 3px 2px !important;"><b>Birth Date</b></td>
+                  <td style="padding: 3px 2px !important;">&nbsp;:&nbsp;</td>
+                  <td style="padding: 3px 2px !important;"><span><b>{{ this.idCardData.dob }}</b></span></td>
+                </tr>
+                <tr>
+                  <td style="padding: 3px 2px !important;"><b>Mobile No.</b></td>
+                  <td style="padding: 3px 2px !important;">&nbsp;:&nbsp;</td>
+                  <td style="padding: 3px 2px !important;"><span> <b>{{ this.idCardData.userNumber }}</b></span></td>
+                </tr>
+                <tr>
+                  <td style="padding: 3px 2px !important;"><b>Emergency no</b></td>
+                  <td style="padding: 3px 2px !important;">&nbsp;:&nbsp;</td>
+                  <td style="padding: 3px 2px !important;"><span><b>{{ this.idCardData.otherContactNumber }}</b></span>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div class="d-flex justify-content-end w-100 pr10" style="margin-top: -15px !important;">
+              <div>
+                <div class="d-flex justify-content-end" style="margin-right: 20px !important;">
+                  <img src="{{this.ApiURL}}uploads/company/signature/{{ this.idCardData.authorizedSignature }}"
+                    alt="digital-signature" class="signatureImage" />
+                </div>
+                <div class="fwnormal fs17" style="margin-top: 10px !important;">
+                  Authorised Signatory
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="footer">
+            <p class="footer_text">
+              EMPLOYEE ID CARD
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</body>
+
+</html>

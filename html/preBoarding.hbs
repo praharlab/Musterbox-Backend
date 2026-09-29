@@ -1,0 +1,69 @@
+<html lang='en'>
+  <head>
+    <link rel='stylesheet' href='./bootstrap.css' />
+    <title>
+      PreBoarding Form
+    </title>
+    <style>
+      body{ margin: 20px; } .question { width: 50%; font-size: 14px; padding:
+      6px; text-align: justify; letter-spacing: 1px; vertical-align: top;}
+      .row1::after { content: ""; display: table; clear: both; } tr {
+      page-break-inside: avoid; }
+
+    </style>
+  </head>
+
+  <body>
+    <div class='row1'>
+      <div>
+        <h2 style='text-align: center;'>{{companyName}}</h2>
+      </div>
+      <div style='margin-bottom : 20px'>
+        <table
+          border='1'
+          style='border-collapse: collapse;width:100% !important;'
+        >
+          {{#each preBoardingBasicFormData}}
+            <tr>
+              <td class='question' style='width:40% !important;'>
+                {{this.question}}
+              </td>
+              <td class='question' style='width:60% !important;'>
+                {{this.answer}}
+              </td>
+            </tr>
+          {{/each}}
+        </table>
+      </div>
+
+      <div style='margin-bottom : 20px'>
+        {{#each formTitle}}
+          <h4>{{this.question}} : {{this.answer}}</h4>
+        {{/each}}
+      </div>
+
+      <div>
+        <table
+          border='1'
+          style='border-collapse: collapse;width:100% !important;'
+        >
+          {{#each preBoardingFormData}}
+            <tr>
+              <td class='question' style='width:40% !important;'>
+                {{this.question}}
+              </td>
+              <td class='question' style='width:60% !important;'>
+                {{this.answer}}
+              </td>
+            </tr>
+          {{/each}}
+        </table>
+      </div>
+    </div>
+
+    <script src='./bootstrap.js'></script>
+    <script src='./jquery.js'></script>
+    <script src='./popper.js'></script>
+  </body>
+
+</html>

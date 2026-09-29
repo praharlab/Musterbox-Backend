@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pay Slip</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td {
+            padding: 5px;
+            border: 1px solid black;
+        }
+
+        body {
+            font-size: 12px;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+
+        .border{
+            border: 1px solid black;
+        }
+
+        .text-center{
+            text-align: center;
+        }
+
+        .p10{
+            padding: 10px;
+        }
+
+        .mblock10{
+            margin-block: 10px;
+        }
+
+        .pline10{
+            padding-inline: 10px;
+        }
+
+        .border-top-bottom{
+            border: 1px solid black;
+            border-left: 0px !important;
+            border-right: 0px !important;
+        }
+
+        .border-left0{
+            border-left: 0px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+
+        <h4 class="text-center">
+            PIH International Hospital Pay Advice Slip
+        </h4>
+
+        <table class="mblock10">
+            <tbody>
+                <tr>
+                    <td><b>Emp Code</b></td>
+                    <td><b>Emp Name</b></td>
+                    <td><b>Date of Joining</b></td>
+                    <td><b>Working Location</b></td>
+                    <td><b>Pay Ref</b></td>
+                </tr>
+                <tr>
+                    <td>{{employeeDetails.employeeCode}}</td>
+                    <td>{{employeeDetails.employeeName}}</td>
+                    <td>{{employeeDetails.joining}}</td>
+                    <td>{{employeeDetails.workingLocation}}</td>
+                    <td>{{employeeDetails.payRef}}</td>
+                </tr>
+
+                <tr>
+                    <td><b>Total Working Hrs/Days</b></td>
+                    <td><b>Actual Working Hrs/Days </b></td>
+                    <td><b>LWOP</b></td>
+                    <td><b>Sick Leave</b></td>
+                    <td><b>AL Taken</b></td>
+                </tr>
+                <tr>
+                    <td>{{employeeDetails.TotalWorkingHrs}}</td>
+                    <td>{{employeeDetails.actualWorkingHrs}}  </td>
+                    <td>{{employeeDetails.LWOP}}</td>
+                    <td>{{employeeDetails.SickLeave}}</td>
+                    <td>{{employeeDetails.AL}}</td>
+                </tr>
+                
+                <tr>
+                    <td><b>Bank Name</b></td>
+                    <td><b>Branch Name</b></td>
+                    <td><b>BSB Code</b></td>
+                    <td><b>Pay Start Date</b></td>
+                    <td><b>Pay End Date</b></td>
+                </tr>
+                <tr>
+                    <td>{{employeeDetails.BankName}}</td>
+                    <td>{{employeeDetails.bankBranch}}</td>
+                    <td>{{employeeDetails.BSBCode}}</td>
+                    <td>{{employeeDetails.payStartDate}}</td>
+                    <td>{{employeeDetails.payEndDate}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="d-flex mblock10">
+            <div class="w-100 border">
+                <h3 class="border-top-bottom pline10">
+                    Earnings
+                </h3>
+                {{#if earnings}}
+                <div class="p10">
+                    <table>
+                        <tr>
+                            <td>Description</td>
+                            <td>Actual working days</td>
+                            <td>Amount</td>
+                            <td>YTD</td>
+                        </tr>
+                        {{#each earnings}}
+                        <tr>
+                            <td>{{payheadName}}</td>
+                            <td>{{actualWorkingHrs}}</td>
+                            <td>{{amount}}</td>
+                            <td>{{YTD}}</td>
+                        </tr>
+                        {{/each}}
+                        <tr>
+                            <td><b>Total(A)</b></td>
+                            <td>-</td>
+                            <td>{{earning_Total_amount}}</td>
+                            <td>{{earning_Total_YTD}}</td>
+                        </tr>
+                    </table>
+                </div>
+                {{/if}}
+            </div>
+            <div class="w-100 border border-left0">
+                {{#if nonTaxable}}
+                <h3 class="border-top-bottom pline10">
+                    Non-Taxable Benefits
+                </h3>
+                <div class="p10">
+                    <table>
+                        <tr>
+                            <td><b>Description</b></td>
+                            <td><b>Amount</b></td>
+                            <td><b>YTD</b></td>
+                        </tr>
+                        {{#each nonTaxable}}
+                        <tr>
+                            <td>{{payheadName}}</td>
+                            <td>{{amount}}</td>
+                            <td>{{YTD}}</td>
+                        </tr>
+                        {{/each}}
+                        <tr>
+                            <td><b>Total(B)</b></td>
+                            <td>{{nonTaxable_Total_amount}}</td>
+                            <td>{{nonTaxable_Total_YTD}}</td>
+                        </tr>
+                    </table>
+                </div>
+                {{/if}}
+
+
+                {{#if deductions}}
+                <h3 class="border-top-bottom pline10">
+                    Contributions/ Deductions
+                </h3>
+                <div class="p10">
+                    <table>
+                        <tr>
+                            <td><b>Description</b></td>
+                            <td><b>Amount</b></td>
+                            <td><b>YTD</b></td>
+                        </tr>
+                        {{#each deductions}}
+                        <tr>
+                            <td>{{payheadName}}</td>
+                            <td>{{amount}}</td>
+                            <td>{{YTD}}</td>
+                        </tr>
+                        {{/each}}
+                        <tr>
+                            <td><b>Total(C)</b></td>
+                            <td>{{deductions_Total_amount}}</td>
+                            <td>{{deductions_Total_YTD}}</td>
+                        </tr>
+                    </table>
+                </div>
+                {{/if}}
+
+                {{#if taxLiability}}
+                <h3 class="border-top-bottom pline10">
+                    Tax Liability
+                </h3>
+                <div class="p10">
+                    <table>
+                        <tr>
+                            <td><b>Description</b></td>
+                            <td><b>Amount</b></td>
+                            <td><b>YTD</b></td>
+                        </tr>
+                        {{#each taxLiability}}
+                        <tr>
+                            <td>{{payheadName}}</td>
+                            <td>{{amount}}</td>
+                            <td>{{YTD}}</td>
+                        </tr>
+                        {{/each}}
+                        <tr>
+                            <td><b>Total(D)</b></td>
+                            <td>{{taxLiability_Total_amount}}</td>
+                            <td>{{taxLiability_Total_YTD}}</td>
+                        </tr>
+                    </table>
+                </div>
+                {{/if}}
+            </div>
+        </div>
+
+        {{#if employer_contribution}}
+        <table>
+            <tr>
+                <td><b>Employer Contribution</b></td>
+                <td><b>Amount</b></td>
+                <td><b>YTD</b></td>
+            </tr>
+            {{#each employer_contribution}}
+            <tr>
+                <td>{{payheadName}}</td>
+                <td>{{amount}}</td>
+                <td>{{YTD}}</td>
+            </tr>
+            {{/each}}
+        </table>
+        {{/if}}
+        <table class="mblock10">
+            <tr>
+                {{#if earning_Total_amount}}
+                <td><b>Taxable Pay A</b></td>
+                {{/if}}
+                {{#if nonTaxable_Total_amount}}
+                <td><b>Non – Taxable B</b></td>
+                {{/if}}
+                <td><b>Gross Pay</b></td>
+                
+                {{#if deductions_Total_amount}}
+                <td><b>Contribution / Deduction
+                    C</b></td>
+                {{/if}}
+                {{#if taxLiability_Total_amount}}
+                <td><b>Tax D</b></td>
+                {{/if}}
+                
+                <td><b>NET PAY</b></td>
+            </tr>
+            <tr>
+                {{#if earning_Total_amount}}
+                <td>{{earning_Total_amount}}</td>
+                {{/if}}
+                {{#if nonTaxable_Total_amount}}
+                <td>{{nonTaxable_Total_amount}}</td>
+                {{/if}}
+                <td>{{gross}}</td>
+                {{#if deductions_Total_amount}}
+                <td>{{deductions_Total_amount}}</td>
+                {{/if}}
+                {{#if taxLiability_Total_amount}}
+                <td>{{taxLiability_Total_amount}}</td>
+                {{/if}}
+                <td>{{netPay}}</td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>

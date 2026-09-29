@@ -1,0 +1,215 @@
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="./bootstrap.css" />
+    <title>Daily In Out Report</title>
+    <style>
+      body {
+        margin: 20px !important;
+        font-family: Arial, sans-serif !important;
+      }
+
+      th,
+      td {
+        border: 1px solid rgb(0, 0, 0);
+        border-collapse: collapse;
+      }
+
+      tr:first-child {
+        border-bottom: 1px solid rgb(0, 0, 0);
+        border-top: 1px solid rgb(255, 255, 255);
+        border-left: 1px solid rgb(255, 255, 255);
+        border-right: 1px solid rgb(255, 255, 255);
+      }
+
+      .table {
+        page-break-inside: auto;
+      }
+
+      .table tr {
+        page-break-inside: avoid !important;
+      }
+
+      .table td {
+        page-break-inside: avoid !important;
+      }
+
+      tr {
+        page-break-inside: avoid !important;
+      }
+
+      th,
+      td {
+        font-size: 11px !important;
+        text-wrap: wrap;
+        white-space: wrap;
+        text-align: center;
+        padding: 2px !important;
+      }
+
+      @media print {
+        table {
+          margin-bottom: 20px !important;
+          /* Increase margin as needed */
+        }
+
+        thead {
+          display: table-header-group;
+        }
+
+        @page {
+          margin-bottom: 40px !important;
+          margin-top: 30px !important;
+
+          /* Adjust margin as needed */
+        }
+      }
+
+      .text-right{
+        text-align: right;
+      }
+
+      .text-left{
+        text-align: left;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div>
+      <div
+        style="
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+        "
+      >
+        <span>
+          <h5 style="margin-bottom: 0px !important">Daily In-Out Report</h5>
+        </span>
+        <span>
+          <h5 style="margin-bottom: 0px !important">{{companyName}}</h5>
+        </span>
+      </div>
+
+      <div style="text-align: right">
+        <span style="font-size: 11px; margin-left: 40%"
+          >{{companyAddress}}</span
+        >
+      </div>
+
+      <div>
+        <table
+          style="
+            border-collapse: collapse !important;
+            width: 100% !important;
+            margin-bottom: 20px !important;
+          "
+        >
+          <thead>
+            <tr>
+              <td
+                colspan="8"
+                style="
+                  border-top: none !important;
+                  border-left: none !important;
+                  border-right: none !important;
+                "
+              >
+                <div style="font-size: 11px; text-align: left !important">
+                  <span> From : {{startdate}}</span>
+                  <span style="margin-left: 5px"> To : {{enddate}}</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>Emp ID</th>
+              <th>Emp Name</th>
+              <th>Attn Date</th>
+              <th>In Time</th>
+              <th>Out Time</th>
+              <th>Total Hrs</th>
+              <th>OS Hrs</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>Branch</b></td>
+              <td colspan="7" style="text-align: left !important">
+                {{this.branch}}
+              </td>
+            </tr>
+            <tr>
+              <td><b>Department</b></td>
+              <td colspan="7" style="text-align: left !important">
+                {{this.department}}
+              </td>
+            </tr>
+            {{#each data}}
+            <tr>
+              <td>{{this.EmployeeCode}}</td>
+              <td colspan="7" style="text-align: left !important">
+                <b>{{this.EmployeeName}}</b>
+              </td>
+            </tr>
+            {{#each this.attendanceData}}
+            <tr>
+              <td>&nbsp;</td>
+              <td>{{this.shift}}</td>
+               <td>
+                <div style="display: flex; justify-content: left; width: 80%; margin: auto;">
+                  <div class="text-right">{{this.AttendanceDate}}</div>
+                  <div class="text-left" style="margin-left: 5px;">{{this.day}}</div>
+                </div>
+               </td>
+              <td>
+                {{#each this.inTime}}
+                <div>{{this}}</div>
+                {{/each}}
+              </td>
+              <td>
+                {{#each this.outTime}}
+                <div>{{this}}</div>
+                {{/each}}
+              </td>
+              <td>{{this.totalHrs}}</td>
+              <td>{{this.OSHrs}}</td>
+              <td>{{this.Status}}</td>
+            </tr>
+            {{/each}}
+            <tr>
+              <td colspan="5">&nbsp;</td>
+              <td><b>{{this.totalInHrs}}</b></td>
+              <td><b>{{this.totalOsHrs}}</b></td>
+              <td>&nbsp;</td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+      <div
+        style="
+          font-size: 8px;
+          position: fixed !important;
+          margin-top: 31px !important;
+          bottom: 0px !important;
+          left: 15px !important;
+          right: 15px !important;
+          width: calc(100% - 0px) !important;
+        "
+      >
+        <span>
+          <b
+            >W = Weekly Off / A = Absent / H = Holiday / HD = Half Day / PW =
+            Present On WeekOff Day / PH = Present On Holiday / XX = Not
+            Applicable / E = Not Punched Out
+          </b>
+        </span>
+      </div>
+    </div>
+
+    <script src="./bootstrap.js"></script>
+    <script src="./jquery.js"></script>
+    <script src="./popper.js"></script>
+  </body>
+</html>

@@ -1,0 +1,122 @@
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="./bootstrap.css" />
+  <title>Salary register With Date Of Pay</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif !important;
+    }
+
+    */ .table {
+      page-break-inside: auto;
+    }
+
+    .table tr {
+      page-break-inside: avoid;
+    }
+
+    .table td {
+      page-break-inside: avoid;
+    }
+
+    tr {
+      page-break-inside: avoid !important;
+    }
+
+    th {
+      font-size: 8px;
+      padding-top: 2px;
+      padding-bottom: 2px;
+      text-wrap: wrap;
+      white-space: wrap;
+      line-height: 10px;
+    }
+
+    td {
+      padding-top: 2px;
+      padding-bottom: 2px;
+      font-size: 8px;
+      text-wrap: wrap;
+      white-space: wrap;
+    }
+
+    .vertical-text {
+      writing-mode: vertical-lr;
+    }
+
+    @media print {
+      @page {
+        margin: 15px 15px !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <table style="width: 100%; border: hidden" border="0">
+    <td style="display: flex; justify-content: center; align-items: center">
+      {{#if companyLogo}}
+      <img style="
+            object-fit: cover;
+            width: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50px;
+          " src="{{ApiURL}}uploads/company/logo/{{ companyLogo }}" />
+      {{else}}
+      <div style="
+            width: auto;
+            object-fit: contain;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50px;
+          "></div>
+
+      {{/if}}
+    </td>
+    <td>
+      <div><span style="font-size: 18px">{{companyName}}</span></div>
+      <div><span style="font-size: 12px">{{companyAddress}}</span></div>
+    </td>
+  </table>
+
+  <div style="text-align: center; font-size: 22px; margin: 8px !important">
+    CTC Master Report
+  </div>
+
+  <div style="margin-bottom: 20px">
+    <table border="1" style="
+          width: 100%;
+          border-collapse: collapse;
+          border: 1px solid rgb(189, 189, 189);
+        ">
+      <tr>
+        {{#each headers}}
+        <th>{{this}}</th>
+        {{/each}}
+      </tr>
+      {{#each MainData}}
+      <tr>
+        {{#forIn this}}
+        <td style="
+              text-align: center;
+              line-height: 10px;
+              border: 1px solid rgb(189, 189, 189);
+            ">
+          {{value}}
+        </td>
+        {{/forIn}}
+      </tr>
+      {{/each}}
+    </table>
+  </div>
+
+  <script src="./bootstrap.js"></script>
+  <script src="./jquery.js"></script>
+  <script src="./popper.js"></script>
+</body>
+
+</html>

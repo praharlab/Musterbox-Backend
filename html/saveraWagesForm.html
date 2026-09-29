@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Salary Wages Sheet</title>
+  <style>
+    * {
+      margin: 0px;
+      padding: 0px;
+      box-sizing: border-box;
+      font-size: 6px;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      /* Ensure table takes full width */
+    }
+
+    thead {
+      display: table-header-group !important;
+    }
+
+    td,
+    th {
+      border: 0.05px solid black;
+      padding: 0px 3px !important;
+      height: 55px;
+      text-align: center;
+      word-wrap: break-word;
+    }
+
+    /* Page break applied on div containing the table */
+    .page-break {
+      page-break-before: always;
+    }
+
+    @media print {
+      @page {
+        margin: 20px;
+        size: A4 landscape;
+      }
+
+      /* Prevent row breaking inside a single row */
+      tr {
+        page-break-inside: avoid;
+      }
+
+      /* Make sure headers repeat and content is not split on pages */
+      thead {
+        display: table-header-group !important;
+      }
+    }
+
+    .fs14 {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .fs12 {
+      font-size: 12px;
+    }
+
+    .fs7 {
+      font-size: 7px;
+    }
+
+    .container {
+      padding: 20px 0px 10px 0px;
+    }
+
+    .headHeight {
+      height: 30px !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    {{#each finalgroupedArray}}
+    <div class="page-break">
+      <table class="mainTable">
+        <thead>
+          <tr>
+            <td colspan="100%" class="text-center fs14" style="border: none;">
+              {{contractorName}} - Wages Sheet ( For the Month Of : {{../month}})
+            </td>
+          </tr>
+          <tr>
+            <td colspan="6" class="border-bottom border-top-none border-right headHeight">
+              &nbsp;
+            </td>
+            <td colspan="{{../rateSize}}" class="text-center fs12 headHeight">Rates</td>
+            <td colspan="{{../earningSize}}" class="text-center fs12 headHeight">Earnings</td>
+            <td colspan="{{../deductionSize}}" class="text-center fs12 headHeight">
+              Deduction
+            </td>
+          </tr>
+          <tr>
+            {{#each ../keysArray}}
+            <th class="word-break fs7">{{this}}</th>
+            {{/each}}
+          </tr>
+        </thead>
+        <tbody>
+          {{#each data}}
+          <tr>
+            {{#each this}}
+            <td>{{ this}}</td>
+            {{/each}}
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    {{/each}}
+  </div>
+
+</body>
+
+</html>

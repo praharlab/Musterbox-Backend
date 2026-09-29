@@ -1,0 +1,189 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <title>Contract Form</title>
+    <style>
+        * {
+            font-size: 13px;
+            font-family: "Noto Sans Devanagari", serif;
+        }
+
+        .container {
+            max-width: 880px;
+            margin: 20px 10px !important;
+            border: 1px solid black;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        td {
+            border: 1px solid black;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .ml50 {
+            margin-left: 50px;
+        }
+
+        .ml20 {
+            margin-left: 20px;
+        }
+
+        .rspace {
+            margin-right: 150px;
+        }
+
+        .signStamp {
+            margin-right: 50px;
+            margin-bottom: 25px;
+        }
+
+        p {
+            margin: 0px;
+            margin-top: 5px;
+        }
+
+        h3 {
+            margin: 0px;
+            padding: 10px;
+            border: 1px solid black;
+        }
+
+        .p5 {
+            padding: 5px;
+        }
+
+        .footer-text {
+            display: flex;
+            justify-content: space-around;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h3 class="text-center">कंत्राटदार व कंपनीमधील करार</h3>
+        <div class="p5">
+            <p>प्रती,</p>
+            <p><b>Mr/Mrs/Miss. {{userName}} ( {{usersContractorName}} )</b></p>
+            <p>खालील नमुद केलेल्या कंत्राटी कामगार Savera Auto Comps Pvt Ltd Unit-1 ला अर्धकुशल कंत्राटी कामगार म्हणून
+                देण्यास राजी आहे.</p>
+            <p>१. कंत्राटी कामगारांचे खालील दिल्याप्रमाणे वर्गीकरण केलेले आहे.</p>
+            <p>(कृपया कामगाराचा हुद्दा निवडा)</p>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>वर्ग</td>
+                        <td>हुद्दा</td>
+                        <td>निवडा</td>
+                    </tr>
+                    <tr>
+                        <td>कुशल</td>
+                        <td>
+                            <p>
+                                डाय सेटर, टूल मेकर\टर्नर, <br>
+                                लाईन लीडर/ड्राइव्हर /क्लोथ कटर/ <br>
+                                फिटर/इलेक्ट्रिशियन
+                            </p>
+                        </td>
+                        <td style="text-align: center;">
+                            {{#if (and (eq userSkillCategory '( skilled (कुशल) )'))}}
+                                <h1 style="margin: 0; transform: scale(3,3);">✔</h1>
+                            {{/if}}
+                        </td>
+                        
+                    </tr>
+                    <tr>
+                        <td>अर्धकुशल</td>
+                        <td>
+                            <p>
+                                फॅब्रिकेटर/वेल्डर/कोटर, <br>
+                                इन्स्पेक्टर/ऑपरेटर/प्रेस ऑपरेटर
+                            </p>
+                        </td>
+                        <td style="text-align: center;">
+                            {{#if (and (eq userSkillCategory '( semiskilled (अर्धकुशल) )'))}}
+                            <h1 style="margin: 0; transform: scale(3,3);">✔</h1>
+                            {{/if}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>अकुशल</td>
+                        <td>
+                            <p>
+                                ट्रेनी फॅब्रिकेटर, ट्रेनी वेल्डर, ट्रेनी <br>
+                                कोटर, ट्रेनी इन्स्पेक्टर, <br>
+                                ट्रेनी ऑपरेटर/प्रेस ऑपरेटर/प्रोसेस <br>
+                                ऑपरेटर <br>
+                                ट्रॅनी असेम्ब्लर, हेल्पर/हॅन्डलर
+                            </p>
+                        </td>
+                        <td style="text-align: center;">
+                            {{#if (and (eq userSkillCategory '( unskilled (अकुशल) )'))}}
+                            <h1 style="margin: 0; transform: scale(3,3);">✔</h1>
+                            {{/if}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <br>
+            <p>२. वरील निवडलेल्या हुद्द्यानुसार कामगाराला खालील प्रमाणे पगार वजावट लागू आहे.</p>
+            <table>
+                <tbody>
+                    {{#each salaryData}}
+                    <tr>
+                        {{#if this.payheadDisplayName }}
+                        
+                        <td>{{this.payheadDisplayName}}</td>
+                        {{else}}
+                        <td>{{this.payheadName}}</td>
+                        {{/if}}
+                        <td>{{this.EmployeeSalaryAmount}}</td>
+                        <td>{{this.marathiEmployeeSalaryAmount}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            <p>३. कंत्राटाद्वारे कामावर असलेल्या कामगारांच्या निष्काळजीपणामुळे कंपनीची हानी किंवा नुकसान झाल्यास
+                नुकसानभरपाईसाठी कंत्राटदाराला पुरेसे परतफेड करणे आवश्यक आहे.</p>
+            <p>४. करारानुसार कामकाजाच्या कागदपत्राबरोबर च कंत्राटदार कंपनीला बीले सादर करेल. आणि त्या कागदपत्राच्या
+                आधारावर देय असेल.</p>
+            <p>५. पूर्ण आणि अंतिम पद्धत,</p>
+            <p class="ml20">अ. एखादा कामगार विनामाहीती ३ किंवा ३ पेक्षा जास्त दिवस कामावरून गैरहजर राहिल्यास संबंधीत
+                कंत्राटदाराला सूचित करण्यात येईल.</p>
+            <p class="ml20">ब. कंत्राटदाराच्या पुष्टीकरणावरून जर संबंधीत कामगार परत येणार नसेल तर अशा कामगारांचे नाव
+                कंपनीच्या कामगार दलाच्या नोंदणीमधून काढण्यात येईल.</p>
+            <p class="ml20">क. अशा सर्व कामगारांचे दर महिन्याचा २० तारखेला त्याचे पूर्ण व अंतिम सेटलमेंट करण्यात येईल.
+            </p>
+            <p class="ml20">ड. जर कंत्राटदार माहितीच्या तारखेपासून १५ कामाच्या दिवसात प्रतिसाद देत नसेल तर पूर्ण आणि
+                अंतिम सेटलमेंट करण्याचा हक्क कंपनी व्यवस्थापनाकडे असेल.</p>
+            <p class="ml20">इ. जर संबंधित कामगार कामावर रुजू झाला नाही तर त्याचे पूर्ण आणि अंतिम सेटलमेंट करण्याचा हक्क
+                कंपनी व्यवस्थापनाकडे असेल व संबंधित कामगाराला त्याने दिलेल्या घराच्या पत्त्यावर पत्रव्यवहार करून तसे
+                सूचित करण्यात येईल.</p>
+            <p>६. वरील नियम मान्य असल्यास पत्राच्या दुसऱ्या प्रतीवर सही करून परत करावी.</p>
+            <br>
+            <div class="footer-text">
+                <div><b>सवेरा स्टॅम्प</b></div>
+                <div><b>{{usersContractorName}}</b></div>
+            </div>
+            <div class="text-right rspace"><b>सही स्टॅम्प</b></div>
+            <br>
+        </div>
+    </div>
+</body>
+
+</html>

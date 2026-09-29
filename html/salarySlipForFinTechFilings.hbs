@@ -1,0 +1,523 @@
+<html lang='en'>
+
+<head>
+  {{!
+  <link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css' /> }}
+  <link rel='stylesheet' href='./bootstrap.css' />
+  <title>
+    Book Face
+  </title>
+  <style>
+    .head {
+      width: 14%;
+      font-size: 12px;
+      padding: 6px;
+      letter-spacing: 1px;
+    }
+
+    .row1::after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+
+    .column1 {
+      float: left;
+      /* width: 50%; */
+    }
+
+    .noBorder {
+      border: 0;
+    }
+
+    .cbs-Item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 150px;
+      height: 50px;
+      margin: 5%;
+    }
+
+    .cbs-Item img {
+      max-width: 100%;
+      max-height:
+        100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div
+    style='border: 1px solid black;width: 736px !important; border-collapse: collapse;top : 20px; margin : 40px auto !important;'>
+    {{! <div style="border: 1px solid black;width: 704px !important;height: 1033px !important; margin: % 5% 5% 5%;">
+      }}
+      <table style='width: 100%;'>
+        <tr>
+          <th style='width: 20%;' rowspan='8'>
+            <div class='cbs-Item'>
+              <img src='{{ApiURL}}uploads/company/logo/{{companylogo}}' />
+            </div>
+          </th>
+        <tr>
+          <td class='text-center' style='font-size: 17px;text-align: center;'><b>{{companyname}}</b></td>
+        </tr>
+        {{#if CIN_Number}}
+        <tr>
+          <td class='text-center' style='font-size: 13px;text-align: center;'><b>{{CIN_Number}}</b></td>
+        </tr>
+        {{/if}}
+        <tr>
+          <td class='text-center' style='font-size: 12px;text-align: center;'>
+            Address :-
+            {{companyaddress}}</td>
+        </tr>
+        <tr>
+          <td class='text-center' style='font-size: 12px;text-align: center;'>
+            <div> Email :- hr@fintechfilings.com</div>
+            {{#if companyWebsite}}
+            <div>Website:- {{companyWebsite}}</div>
+            {{/if}}
+
+          </td>
+        </tr>
+        <tr>
+          <td class='text-center' style='visibility: hidden;'>555-1234</td>
+        </tr>
+        </tr>
+        <tr>
+          <td rowspan='8' class='text-center pb-2' style='text-align: center;'>
+            <div style='font-size: 13px;'><b>Salary Slip for the Month
+                {{month}}-{{year}}</b></div>
+            <div style='font-size: 12px;'>
+              <b>( From
+                {{start_date}}
+                To
+                {{end_date}})</b>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <th style='width: 20%;visibility: hidden;' rowspan='8'>Phone</th>
+        </tr>
+
+      </table>
+      <table border='1' style='width: 100%;border:1px solid black;border-left: hidden;border-collapse: collapse;'>
+        <tr>
+          <td class='head'>
+            <b>Employee Code</b>
+          </td>
+          <td class='head' style='width: 25%;'>
+            {{employeecode}}
+          </td>
+          <td class='head' style='width: 10%;'>
+            <b>UAN No</b>
+          </td>
+          <td class='head' style='width: 18%;'>
+            {{uanNumber}}
+          </td>
+          <td class='head' style='width: 10%;'>
+            <b>Month Days</b>
+          </td>
+          <td class='head' style='width: 13%;border-right: hidden;'>
+            {{monthDays}}
+          </td>
+
+        </tr>
+        <tr>
+          <td class='head'>
+            <b>Employee Name</b>
+          </td>
+          <td class='head'>
+            {{employeename}}
+          </td>
+          <td class='head' style='width: 150px;'>
+            <b>PF No</b>
+          </td>
+          <td class='head' style='width: 150px;'>
+            {{pfNumber}}
+          </td>
+          <td class='head' style='width: 100px;'>
+            <b>Present</b>
+          </td>
+          <td class='head' style='width: 100px;border-right: hidden;'>
+            {{presentday}}
+          </td>
+
+        </tr>
+        <tr>
+          <td class='head'>
+            <b>Date Of Joining</b>
+          </td>
+          <td class='head'>
+            {{joiningdate}}
+          </td>
+          <td class='head'>
+            <b>PAN No</b>
+          </td>
+          <td class='head'>
+            {{pancard}}
+          </td>
+          <td class='head'>
+            <b>Weekoff</b>
+          </td>
+          <td class='head' style='border-right: hidden;'>
+            {{weekoff}}
+          </td>
+
+        </tr>
+        <tr>
+          <td class='head'>
+            <b>Work Location</b>
+          </td>
+          <td class='head'>
+            {{branch}}
+          </td>
+          <td class='head'>
+            <b>ESIC NO</b>
+          </td>
+          <td class='head'>
+            {{esicNumber}}
+          </td>
+          <td class='head'>
+            <b>Holiday</b>
+          </td>
+          <td class='head' style='border-right: hidden;'>
+            {{holiday}}
+          </td>
+
+        </tr>
+
+        <tr>
+          <td class='head'>
+            <b>Department</b>
+          </td>
+          <td class='head'>
+            {{department}}
+          </td>
+          <td class='head' style='width: 150px;'>
+
+          </td>
+          <td style='width: 150px;'>
+
+          </td>
+          {{#if (and (eq this.salarycalculated 'monthly'))}}
+          <td class='head'>
+            <b>Paid Leave</b>
+          </td>
+          <td class='head' style='width: 100px;border-right: hidden;'>
+            {{paidleave}}
+          </td>
+          {{/if}}
+          {{#if (and (eq this.salarycalculated 'hourly'))}}
+          <td class='head'>
+            <b>Working Hours</b>
+          </td>
+          <td class='head' style='width: 100px;border-right: hidden;'>
+            {{workinghour}}
+          </td>
+          {{/if}}
+        </tr>
+
+        <tr>
+          <td class='head'>
+            <b>Designation</b>
+          </td>
+          <td class='head'>
+            {{designation}}
+          </td>
+          {{#if (and (eq attendancePenaltyShow true))}}
+          <td class='head' style='width: 150px;'>
+            <b>Attendance Penalty</b>
+          </td>
+          <td class='head' style='width: 150px;'>
+            {{attendancePenalty}}
+          </td>
+          {{/if}}
+
+          {{#if (and (eq attendancePenaltyShow false))}}
+          <td class='head' style='width: 150px;'>
+            <b>&nbsp;</b>
+          </td>
+          <td style='width: 150px;'>
+            &nbsp;
+          </td>
+          {{/if}}
+
+          {{#if (and (eq this.salarycalculated 'monthly'))}}
+          <td class='head'>
+            <b>Unpaid Leave</b>
+          </td>
+          <td class='head' style='width: 100px;border-right: hidden;'>
+            {{unpaidleave}}
+          </td>
+
+          {{/if}}
+          {{#if
+          (and
+          (eq this.salarycalculated 'hourly') (eq this.overtimeshow true)
+          )
+          }}
+          <td class='head'>
+            <b>Overtime Hours</b>
+          </td>
+          <td class='head' style='width: 100px;border-right: hidden;'>
+            {{overtimehour}}
+          </td>
+          {{/if}}
+
+          {{#if
+          (and
+          (eq this.salarycalculated 'hourly') (eq this.overtimeshow false)
+          )
+          }}
+          <td class='head'>
+            &nbsp;
+          </td>
+          <td class='head' style='width: 100px;border-right: hidden;'>
+            &nbsp;
+          </td>
+          {{/if}}
+
+        </tr>
+
+        {{#if this.outDoorDuty}}
+        <tr>
+          <td> &nbsp;</td>
+          <td> &nbsp;</td>
+          <td> &nbsp;</td>
+          <td> &nbsp;</td>
+          <td class='head'> <b>Outdoor Duty</b></td>
+          <td class='head'>{{outDoorDuty}}</td>
+        </tr>
+        {{/if}}
+
+      </table>
+
+      <div class='row1' style='width: 100%;margin-top: 3px;'>
+        <div class='column1' style='width: 58%;'>
+          <table border='1' style='border:1px solid black;border-left: hidden;border-collapse: collapse;'>
+
+            <tr>
+              <td class='head' style='width: 28%;'>
+                <b>Earning Heads </b>
+              </td>
+              <td class='head' style='width: 18%;'>
+                <b>Fixed Rate</b>
+              </td>
+              <td class='head' style='width: 12%;'>
+                <b>Earnings</b>
+              </td>
+
+            </tr>
+            {{#each earning}}
+            <tr>
+              {{#if (and (eq this undefined))}}
+
+              <td class='head'>
+                &nbsp;
+              </td>
+              {{/if}}
+              {{#if (and (eq this undefined))}}
+
+              <td class='head'>
+                &nbsp;
+              </td>
+
+              {{/if}}
+              {{#if (and (eq this undefined))}}
+
+              <td class='head'>
+                &nbsp;
+              </td>
+              {{/if}}
+
+              {{#if
+              (and
+              (eq this.salaryfieldside 'E') (eq this.salaryfieldshow 'Y')
+              )
+              }}
+
+              <td class='head'>
+                {{this.payheadName}}
+              </td>
+              {{/if}}
+
+              {{#if
+              (and
+              (eq this.salaryfieldside 'E') (eq this.salaryfieldshow 'Y')
+              )
+              }}
+              <td class='head'>
+                {{this.actualamount}}
+              </td>
+              {{/if}}
+
+              {{#if
+              (and
+              (eq this.salaryfieldside 'E') (eq this.salaryfieldshow 'Y')
+              )
+              }}
+              <td class='head'>
+                {{this.employeeAmount}}
+              </td>
+              {{/if}}
+            </tr>
+            {{/each}}
+            <tr>
+              <td class='head'>
+                <b>Gross Earning</b>
+              </td>
+              <td class='head'>
+                <b>{{totalactualearning}} </b>
+              </td>
+              <td class='head'>
+                <b>{{totalearning}} </b>
+              </td>
+            </tr>
+
+          </table>
+        </div>
+        <div class='column1' style='width: 42%;'>
+          <table border='1' style='border:1px solid black;border-left: hidden;border-collapse: collapse;'>
+
+            <tr>
+
+              <td class='head' style='width: 29%;'>
+                <b>Deduction Heads</b>
+              </td>
+              <td class='head' style='border-right: hidden;width: 13%;'>
+                <b>Deductions</b>
+              </td>
+            </tr>
+            {{#each deduction}}
+            <tr>
+
+              {{#if (and (eq this undefined))}}
+
+              <td class='head'>
+                &nbsp;
+              </td>
+              {{/if}}
+              {{#if (and (eq this undefined))}}
+
+              <td class='head' style='border-right: hidden;'>
+                &nbsp;
+              </td>
+
+              {{/if}}
+
+              {{#if
+              (and
+              (eq this.salaryfieldside 'D') (eq this.salaryfieldshow 'Y')
+              )
+              }}
+              <td class='head'>
+                {{this.payheadName}}
+              </td>
+
+              {{/if}}
+
+              {{#if
+              (and
+              (eq this.salaryfieldside 'D') (eq this.salaryfieldshow 'Y')
+              )
+              }}
+
+              <td class='head' style='border-right: hidden;'>
+                {{this.employeeAmount}}
+              </td>
+              {{/if}}
+            </tr>
+            {{/each}}
+            <tr>
+
+              <td class='head'>
+                <b>Gross Deductions </b>
+              </td>
+              <td class='head' style='border-right: hidden;'>
+                <b>{{totaldeduction}} </b>
+              </td>
+            </tr>
+
+          </table>
+        </div>
+      </div>
+
+        {{#if extra_earning.length}}
+
+       <div>
+          <table border='1' style='width: 100%;margin-top: 3px;border:1px solid black;border-left: hidden;border-collapse: collapse;'>
+
+            {{#each extra_earning}}
+            <tr>
+             
+              {{#if
+              (and
+              (eq this.salaryfieldside 'E') (eq this.salaryfieldshow 'Y')
+              )
+              }}
+
+              <td class='head' style='width: 50%;'>
+                {{this.payheadName}}
+              </td>
+              {{/if}}
+
+              {{#if
+              (and
+              (eq this.salaryfieldside 'E') (eq this.salaryfieldshow 'Y')
+              )
+              }}
+              <td class='head' style='width: 25%;'>
+                {{this.actualamount}}
+              </td>
+              {{/if}}
+
+              {{#if
+              (and
+              (eq this.salaryfieldside 'E') (eq this.salaryfieldshow 'Y')
+              )
+              }}
+              <td class='head' style='width: 25%;border-right: hidden;'>
+                {{this.employeeAmount}}
+              </td>
+              {{/if}}
+            </tr>
+            {{/each}}
+
+          </table>
+      </div>
+
+    {{/if}}
+
+      <table border='1'
+        style='width: 100%;border:1px solid black;border-left: hidden;margin-top: 3px;border-collapse: collapse;'>
+        <tr>
+          <td style=' width: 12%; font-size: 12px; padding: 6px; '>
+            <b>Net Payable</b>
+          </td>
+          <td style=' width: 10%; font-size: 12px; padding: 6px;'>
+            {{nettotal}}
+          </td>
+          <td style=' font-size: 12px; 
+                padding: 6px; border-right: hidden;'>
+            <b>In Words:</b>
+            {{numbertext}}
+          </td>
+        </tr>
+        <tr>
+          <td colspan='3' style='padding: 4px 4px 4px 4px;font-size: 12px; border-right: hidden;border-bottom:hidden'>
+            *THIS IS COMPUTER GENERATED PAYMENT SLIP NO SIGNATURE IS REQUIRED
+
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <script src='./bootstrap.js'></script>
+    <script src='./jquery.js'></script>
+    <script src='./popper.js'></script>
+</body>
+
+</html>

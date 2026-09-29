@@ -1,0 +1,919 @@
+<html lang="en">
+
+<head>
+  <title>Book Face</title>
+
+  <style>
+    body {
+      font-size: 8px !important;
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 40px !important;
+    }
+
+    table,
+    th,
+    tr,
+    td,
+    div {
+      font-size: 12px !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div style="border: 1px solid #000" id="content">
+    <br />
+    <table width="100%" border="0" style="border-collapse: collapse">
+      <tr>
+        <td style="text-align: center">
+          COMBINED CHALLAN OF A/C NO. 1,2,10,21 & 22
+        </td>
+      </tr>
+      <tr>
+        <td style="text-align: center">( STATE BANK OF INDIA )</td>
+      </tr>
+      <tr>
+        <td style="text-align: center">
+          <strong>EMPLOYEE'S PROVIDENT FUND ORGANISATION</strong>
+        </td>
+      </tr>
+      <tr>
+        <td style="text-align: center">
+          ( USE SEPARATE CHALLAN FOR EACH MONTH)
+        </td>
+      </tr>
+    </table>
+    <table width="100%" border="0" style="border-collapse: collapse">
+      <tr>
+        <td width="220px;" style="padding-left: 15px">
+          ESTABLISHMENT CODE NO :
+        </td>
+        <td width="200px;">
+          <strong>{{ codeNo }}</strong>
+        </td>
+        <td width="200px;"><strong>PF Group :- II</strong></td>
+        <td width="200px;">PAID BY.CASH/CHEQUE/D.D</td>
+        <td>____________________</td>
+      </tr>
+    </table>
+    <table width="100%" border="0" style="border-collapse: collapse">
+      <tr style="margin-right: 5px">
+        <td width="180px;" style="padding-left: 15px">DUES FOR THE MONTH</td>
+        <td width="180px;">
+          <strong>{{ monthName }}</strong>
+        </td>
+        <td width="290px;">
+          <span>EMPLOYEE SHARE</span>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <span style="
+                margin: 0;
+                display: inline;
+                border: 2px solid rgb(0, 0, 0);
+                font-size: 14px !important;
+                margin-left: 1px;
+                padding-left: 8px;
+                padding-right: 8px;
+              ">
+            12.00 %
+          </span>
+        </td>
+        <td width="180px;">DATE OF PAYMENT</td>
+        <td>
+          <div style="text-align: center">D</div>
+          <div style="
+                margin: 0;
+                display: inline;
+                border: 2px solid black;
+                font-size: 14px !important;
+                padding-left: 25px;
+              "></div>
+        </td>
+        <td>
+          <div style="text-align: center">D</div>
+          <div style="
+                margin: 0;
+                display: inline;
+                border: 2px solid black;
+                font-size: 14px !important;
+                padding-left: 25px;
+              "></div>
+        </td>
+        <td style="margin-left: 2px">
+          <div style="text-align: center">M</div>
+          <div style="
+                margin: 0;
+                display: inline;
+                border: 2px solid black;
+                font-size: 14px !important;
+                padding-left: 25px;
+              "></div>
+        </td>
+        <td>
+          <div style="text-align: center">M</div>
+          <div style="
+                margin: 0;
+                display: inline;
+                border: 2px solid black;
+                font-size: 14px !important;
+                padding-left: 25px;
+              "></div>
+        </td>
+        <td style="margin-left: 2px">
+          <div style="text-align: center">Y</div>
+          <div style="
+                margin: 0;
+                display: inline;
+                border: 2px solid black;
+                font-size: 14px !important;
+                padding-left: 25px;
+              "></div>
+        </td>
+        <td>
+          <div style="text-align: center">Y</div>
+          <div style="
+                margin: 0;
+                display: inline;
+                border: 2px solid black;
+                font-size: 14px !important;
+                padding-left: 25px;
+              "></div>
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td>
+          <span>EMPLOYEER SHARE</span>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <span style="
+                margin: 0;
+                display: inline;
+                border: 2px solid black;
+                font-size: 14px !important;
+                margin-left: 1px;
+                padding-left: 8px;
+                padding-right: 8px;
+              ">
+            12.00 %
+          </span>
+        </td>
+        <td width="200px;"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+    </table>
+    <table width="100%" border="0" style="border-collapse: collapse">
+      <tr>
+        <td width="220px" style="padding-left: 15px">
+          TOTAL No. of SUBSCRIBER
+        </td>
+        <td rowspan="2">
+          <table>
+            <tr>
+              <td width="60px">A/C No. 1</td>
+              <td width="180px">
+                <span style="
+                      margin: 0;
+                      display: inline;
+                      border: 1px solid black;
+
+                      margin-left: 8px;
+                      padding-left: 83px;
+                      padding-right: 10px;
+                    ">
+                  {{ NoEmp }}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>
+                <span style="
+                      margin: 0;
+                      display: inline;
+                      border: 1px solid black;
+
+                      margin-left: 8px;
+                      padding-left: 59px;
+                      padding-right: 10px;
+                    ">
+                  {{ totalwagesdue }}
+                </span>
+              </td>
+            </tr>
+          </table>
+        </td>
+        <td rowspan="2">
+          <table>
+            <tr>
+              <td width="60px">
+                A/C No. <br />
+                10
+              </td>
+              <td width="180px">
+                <span style="
+                      margin: 0;
+                      display: inline;
+                      border: 1px solid black;
+                      font-size: 14px !important;
+                      margin-left: 8px;
+                      padding-left: 83px;
+                      padding-right: 10px;
+                    ">
+                  {{ NoEmp }}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>
+                <span style="
+                      margin: 0;
+                      display: inline;
+                      border: 1px solid black;
+                      font-size: 14px !important;
+                      margin-left: 8px;
+                      padding-left: 59px;
+                      padding-right: 10px;
+                    ">
+                  {{ totalwagesdue }}
+                </span>
+              </td>
+            </tr>
+          </table>
+        </td>
+        <td rowspan="2">
+          <table>
+            <tr>
+              <td width="60px">
+                A/C No. <br />
+                21
+              </td>
+              <td>
+                <span style="
+                      margin: 0;
+                      display: inline;
+                      border: 1px solid black;
+                      font-size: 14px !important;
+                      margin-left: 8px;
+                      padding-left: 83px;
+                      padding-right: 10px;
+                    ">
+                  {{ NoEmp }}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>
+                <span style="
+                      margin: 0;
+                      display: inline;
+                      border: 1px solid black;
+                      font-size: 14px !important;
+                      margin-left: 8px;
+                      padding-left: 59px;
+                      padding-right: 10px;
+                    ">
+                  {{ totalwagesdue }}
+                </span>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding-left: 15px">TOTAL WAGES DUES</td>
+      </tr>
+    </table>
+    <table width="100%" border="0" style="border-collapse: collapse">
+      <thead>
+        <tr style="border-top: 1px solid #000; border-bottom: 1px solid #000">
+          <th style="
+                border-right: 1px solid #000;
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                padding: 5px 0 5px 0;
+              ">
+            Sr.No
+          </th>
+          <th style="
+                text-align: center;
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                padding: 5px 0 5px 0;
+              ">
+            Particulars
+          </th>
+          <th style="
+                text-align: center;
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                padding: 5px 0 5px 0;
+              ">
+            A/c No.1
+          </th>
+          <th style="
+                text-align: center;
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                padding: 5px 0 5px 0;
+              ">
+            A/c No.2
+          </th>
+          <th style="
+                text-align: center;
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                padding: 5px 0 5px 0;
+              ">
+            A/c No.10
+          </th>
+          <th style="
+                text-align: center;
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                padding: 5px 0 5px 0;
+              ">
+            A/c No.21
+          </th>
+          <th style="
+                text-align: center;
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                padding: 5px 0 5px 0;
+              ">
+            A/c No.22
+          </th>
+          <th style="
+                text-align: center;
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                padding: 5px 0 5px 0;
+              ">
+            Total
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="
+                border-right: 1px solid #000;
+                padding: 2px 0 2px 0;
+                padding-left: 15px;
+              ">
+            1
+          </td>
+          <td style="padding: 2px 0 2px 2px">EMPLOYER'S SHARE OF CONT</td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 40px;
+                  padding-right: 10px;
+                ">
+              {{ empac1 }}
+            </span>
+          </td>
+          <td style="padding: 2px 0 2px 0"></td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 40px;
+                  padding-right: 10px;
+                ">
+              {{ empac10 }}
+            </span>
+          </td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 40px;
+                  padding-right: 10px;
+                ">
+              {{ admnac2 }}
+            </span>
+          </td>
+          <td style="padding: 2px 0 2px 0"></td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 40px;
+                  padding-right: 10px;
+                ">
+              {{ empactotal }}
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td style="
+                border-right: 1px solid #000;
+                padding: 2px 0 2px 0;
+                padding-left: 15px;
+              ">
+            2
+          </td>
+          <td style="padding: 2px 0 2px 2px">EMPLOYEE'S SHARE OF CONT</td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 40px;
+                  padding-right: 10px;
+                ">
+              {{ empshareac1 }}
+            </span>
+          </td>
+          <td styl="padding: 2px 0 2px 0;"></td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 80px;
+                  padding-right: 10px;
+                "></span>
+          </td>
+          <td style="padding: 2px 0 2px 0"></td>
+          <td style="padding: 2px 0 2px 0"></td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 40px;
+                  padding-right: 10px;
+                ">
+              {{ empshareac1 }}
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td style="
+                border-right: 1px solid #000;
+                padding: 2px 0 2px 0;
+                padding-left: 15px;
+              ">
+            3
+          </td>
+          <td style="padding: 2px 0 2px 2px">ADMN. CHARGES</td>
+          <td style="padding: 2px 0 2px 0"></td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 40px;
+                  padding-right: 10px;
+                ">
+              {{ admnac2 }}
+            </span>
+          </td>
+          <td style="padding: 2px 0 2px 0"></td>
+          <td style="padding: 2px 0 2px 0"></td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 67px;
+                  padding-right: 10px;
+                ">
+              0
+            </span>
+          </td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 50px;
+                  padding-right: 10px;
+                ">
+              {{ admnac2 }}
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td style="
+                border-right: 1px solid #000;
+                padding: 2px 0 2px 0;
+                padding-left: 15px;
+              ">
+            4
+          </td>
+          <td style="padding: 2px 0 2px 2px">INSP. CHARGES</td>
+          <td style="padding: 2px 0 2px 0"></td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 73px;
+                  padding-right: 10px;
+                "></span>
+          </td>
+          <td style="padding: 2px 0 2px 0"></td>
+          <td style="padding: 2px 0 2px 0"></td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 73px;
+                  padding-right: 10px;
+                "></span>
+          </td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 82px;
+                  padding-right: 10px;
+                "></span>
+          </td>
+        </tr>
+        <tr>
+          <td style="
+                border-right: 1px solid #000;
+                padding: 5px 0 5px 0;
+                padding-left: 15px;
+              ">
+            5
+          </td>
+          <td style="padding: 2px 0 2px 2px">PENAL CHARGES</td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 73px;
+                  padding-right: 10px;
+                "></span>
+          </td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 73px;
+                  padding-right: 10px;
+                "></span>
+          </td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 73px;
+                  padding-right: 10px;
+                "></span>
+          </td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 73px;
+                  padding-right: 10px;
+                "></span>
+          </td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 73px;
+                  padding-right: 10px;
+                "></span>
+          </td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 82px;
+                  padding-right: 10px;
+                "></span>
+          </td>
+        </tr>
+        <tr>
+          <td style="
+                border-right: 1px solid #000;
+                padding: 5px 0 5px 0;
+                padding-left: 15px;
+              ">
+            6
+          </td>
+          <td style="padding: 2px 0 2px 2px">MISC. CHARGES</td>
+          <td style="padding: 2px 0 2px 0"></td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 73px;
+                  padding-right: 10px;
+                "></span>
+          </td>
+          <td style="padding: 2px 0 2px 0"></td>
+          <td style="padding: 2px 0 2px 0"></td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 73px;
+                  padding-right: 10px;
+                "></span>
+          </td>
+          <td style="padding: 2px 0 2px 0">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 82px;
+                  padding-right: 10px;
+                "></span>
+          </td>
+        </tr>
+        <tr style="border-top: 1px solid #000; border-bottom: 1px solid #000">
+          <td style="
+                padding: 5px 0 5px 0;
+                border-right: 1px solid #000;
+                padding-left: 15px;
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+              "></td>
+          <td style="
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                padding: 5px 0 5px 0;
+              ">
+            TOTAL
+          </td>
+          <td style="
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                padding: 5px 0 5px 0;
+              ">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 40px;
+                  padding-right: 10px;
+                ">
+              {{ ac1total }}
+            </span>
+          </td>
+          <td style="
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                padding: 5px 0 5px 0;
+              ">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 40px;
+                  padding-right: 10px;
+                ">
+              {{ admnac2 }}
+            </span>
+          </td>
+          <td style="
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                padding: 5px 0 5px 0;
+              ">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 40px;
+                  padding-right: 10px;
+                ">
+              {{ empac10 }}
+            </span>
+          </td>
+          <td style="
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                padding: 5px 0 5px 0;
+              ">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 40px;
+                  padding-right: 10px;
+                ">
+              {{ admnac2 }}
+            </span>
+          </td>
+          <td style="
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                padding: 5px 0 5px 0;
+              ">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 67px;
+                  padding-right: 10px;
+                ">
+              0
+            </span>
+          </td>
+          <td style="
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                padding: 5px 0 5px 0;
+              ">
+            <span style="
+                  margin: 0;
+                  display: inline;
+                  border: 1px solid black;
+                  font-size: 14px !important;
+                  margin-left: 8px;
+                  padding-left: 40px;
+                  padding-right: 10px;
+                ">
+              {{ total }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table width="100%" border="0" style="border-collapse: collapse">
+      <tr style="border-bottom: 1px solid #000">
+        <td width="20px" style="border-bottom: 1px solid black; padding: 2px 0 2px 0"></td>
+        <td width="190px" style="border-bottom: 1px solid black; padding: 2px 0 2px 0">
+          Amount In Words
+        </td>
+        <td style="
+              border-bottom: 1px solid black;
+              padding: 2px 0 2px 0;
+              font-size: 12px !important;
+            ">
+          {{ totalWord }}
+        </td>
+      </tr>
+    </table>
+    <table width="100%" border="0" style="border-collapse: collapse">
+      <tr>
+        <td width="200px"></td>
+        <td width="340px"></td>
+        <td colspan="2" style="text-align: center">
+          <strong>( For Bank Use Only )</strong>
+        </td>
+      </tr>
+      <tr>
+        <td rowspan="2">
+          <div style="padding-left: 12px">NAME & ADDRESS OF</div>
+          <div style="margin-top: -2px; padding-left: 12px">
+            FACTORY/ESTABLISMENT
+          </div>
+        </td>
+        <td style="font-size: 12px !important">
+          <strong>{{ companyname }}</strong>
+        </td>
+        <td style="font-size: 12px !important">Amount Received Rs.</td>
+        <td>___________________</td>
+      </tr>
+      <tr>
+        <td style="font-size: 12px !important">{{ companyaddress }}</td>
+        <td style="font-size: 12px !important">For Chq./D.D Only</td>
+        <td>___________________</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td style="font-size: 12px !important">Date Of Realisation</td>
+        <td>___________________</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td style="font-size: 12px !important">Date Of Presantion</td>
+        <td>___________________</td>
+      </tr>
+      <tr>
+        <td style="padding-left: 15px">NAME OF DEPOSITER</td>
+        <td style="text-align: right; font-size: 12px !important">
+          <span style="margin-right: 50px">
+            <strong>For , {{ companyname }}</strong>
+          </span>
+        </td>
+        <td style="font-size: 12px !important">Branch Name</td>
+        <td>___________________</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td style="font-size: 12px !important">Branch Code</td>
+        <td>___________________</td>
+      </tr>
+      <tr>
+        <td style="padding-left: 15px; padding-top: 50px">
+          SIGNATURE OF DEPOSITER
+        </td>
+        <td style="text-align: right; padding-top: 50px">
+          <span style="margin-right: 40px">Authorize Signature</span>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td style="padding-left: 15px">( TO BE FILLED BY EMPLOYEER )</td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+    </table>
+    <table width="100%" border="0" style="border-collapse: collapse; margin-bottom: 10px">
+      <tr>
+        <td width="150px" style="padding-left: 15px">Name Of Bank</td>
+        <td width="350px">__________________________________</td>
+        <td width="180px">Chq./D.D No :-</td>
+        <td width="120px"></td>
+        <td width="430px">Date</td>
+      </tr>
+    </table>
+  </div>
+
+  <script src="./bootstrap.js"></script>
+  <script src="./jquery.js"></script>
+  <script src="./popper.js"></script>
+</body>
+
+</html>

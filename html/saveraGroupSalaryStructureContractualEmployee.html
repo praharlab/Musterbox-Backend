@@ -1,0 +1,249 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <title>
+        SALARY STRUCTURE CONTRACTUAL EMPLOYEE
+    </title>
+    <style>
+        * {
+
+            font-family: "Noto Sans Devanagari", serif;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 880px !important;
+            margin: auto;
+            border: 1px solid black;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+            padding: 5px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .p10 {
+            padding: 10px;
+        }
+
+        .mb10 {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <table>
+            <tr>
+                <td colspan="3" class="p10">
+                    <p class="text-right">Date Of Joining: {{userDateOfJoining}}</p>
+                    <p class="text-center mb10"><b>SALARY STRUCTURE CONTRACTUAL EMPLOYEE / कंत्राटी कर्मचाऱ्याचे वेतनाचे
+                            विवरण</b></p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    CONTRACTOR NAME/कंत्राटदाराचे नाव
+                </td>
+                <td colspan="2">
+                    {{usersContractorName}}
+                    <!-- {{marathiUsersContractorName}} -->
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    EMPLOYEE NAME/कर्मचाऱ्याचे नाव
+                </td>
+                <td colspan="2">
+                    {{userName}}
+                    <!-- ({{marathiUserName}}) -->
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    EMPLOYEE CODE/कर्मचाऱ्याचा कोड
+                </td>
+                <td colspan="2">
+                    {{userEmployeeCode}}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    DATE OF JOINING/रुजू झालेली दिनांक
+                </td>
+                <td colspan="2">
+                    {{userDateOfJoining}}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    DEPARTMENT/विभाग
+                </td>
+                <td colspan="2">
+                    {{userDepartment}}
+                    <!-- ({{marathiUserDepartment}}) -->
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    DESIGNATION/पद
+                </td>
+                <td colspan="2">
+                    {{userDesignation}}
+                    <!-- ({{marathiUserDesignation}})  -->
+                    {{userSkillCategory}}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" class="text-center">
+                    <b>EMPLOYEE WAGE DETAILS/कर्मचाऱ्याचा वेतनाची माहिती</b>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" class="text-center">
+                    <b>WAGES PER MONTH/प्रति महिन्याचे वेतन</b>
+                </td>
+            </tr>
+            {{#each dailySalaryData}}
+            <tr>
+                {{#if this.payheadDisplayName }}
+                <td>{{this.payheadDisplayName}}</td>
+                {{else}}
+                <td>{{this.payheadName}}</td>
+                {{/if}}
+                <td>{{this.EmployeeSalaryAmount}}</td>
+                <td>{{this.marathiEmployeeSalaryAmount}}</td>
+            </tr>
+            {{/each}}
+            <tr>
+                <td>
+                    <b>GROSS WAGE (Rs): / एकूण वेतन</b>
+                </td>
+                <td>
+                    {{grossSalary}}
+                </td>
+                <td>
+                    {{grossSalaryMarathiDigit}}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" class="text-center">
+                    <b>EARNING PER DAY/प्रति दिवसाचे वेतन</b>
+                </td>
+            </tr>
+            {{#each filterSalary_A}}
+            <tr>
+                {{#if this.payheadDisplayName }}
+                <td>{{this.payheadDisplayName}}</td>
+                {{else}}
+                <td>{{this.payheadName}}</td>
+                {{/if}}
+                <td>{{this.EmployeeSalaryAmount}}</td>
+                <td>{{this.marathiEmployeeSalaryAmount}}</td>
+
+            </tr>
+            {{/each}}
+            <tr>
+                <td colspan="3" class="text-center">
+                    <b>DEDUCTION/BENEFIT PER DAY: प्रति दिवसाचे कपात फायदे</b>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    PF(12% OF BASIC+VDA) / पीएफ (मूलभूत वेतन + व्हीडीए च्या 12%)
+                </td>
+                <td>
+                    {{dailypfAmount}}
+                </td>
+                <td>
+                    {{marathiDailypfAmount}}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    ESIC(0.75% OF GROSS)/ ईएसआयसी (एकूण पगाराच्या 0.75%)
+                </td>
+                <td>
+                    {{dailyESICAmount}}
+                </td>
+                <td>
+                    {{marathiDailyESICAmount}}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b>TOTAL DEDUCTION:/पूर्ण कपात</b>
+                </td>
+                <td>
+                    {{dailyTotalDudction_PF_ESIC}} <br> {{dailyTotalDudction_PF_ESICInEnglishWords}}
+                </td>
+                <td>
+                    {{marathiDailyTotalDudction_PF_ESIC}} <br> {{dailyTotalDudction_PF_ESICInMarathiWords}}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    PROF. TAX(IF APPLICABLE): Rs 175/- IF TOTAL EARNING PER MONTH >= Rs. 7500(MALE) AND Rs 200/- IF
+                    TOTAL EARINING PER MONTH >= 10000(MALE) Rs. 200/- IF TOTAL EARNING PER MONTH >= Rs 25000(FEMALE)
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    व्यावसायिक कर (लागू असल्यास): १७५ रु. जर एकूण मिळालेले वेतन >= ७५००रु. (पुरुष) आणि २००रु. जर एकूण
+                    मिळालेले वेतन >= १००००रु. (पुरुष) २००रु. जर एकूण मिळालेले वेतन > २५००० रु. (महिला)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b>NET EARNING PER DAY: दररोज निव्वळ पगार</b>
+                </td>
+                <td>
+                    {{dailyNetSalary}} <br> {{daily_netSalaryInEnglishWords}}
+                </td>
+                <td>
+                    {{marathiDailyNetSalary}} <br> {{daily_netSalaryInMarathiWords}}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    OTHER BENEFIT (इतर फायदे): 1. BONUS (8.33% OF BASIC + VDA) / बोनस (८.३३% मूळ पगार + विशेष भत्ता) 2.
+                    GRATUATY (AS PER LAW) / सेवानिवृत्ती शासनाच्या नियमानुसार लागू राहतील
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1">
+                    <b>SIGNATURE(EMPLOYEE) / कामगाराची सही :</b>
+                </td>
+                <td colspan="2">
+                    <b>SIGNATURE(CONTRACTOR): कंत्राटदाराची सही :</b>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" class="text-center">
+                    * This is computer generated file therefore no sign required *
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>

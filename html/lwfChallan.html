@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LWF Challan</title>
+  <style>
+
+    *{
+      margin: 0px;
+      padding: 0px;
+    }
+
+    body {
+      line-height: 1.5;
+      margin: 20px;
+      /* background-color: #f9f9f9; */
+      font-size: 14px;
+    }
+    .container {
+      width: 700px;
+      margin: 0 auto;
+      /* background: #fff; */
+      padding: 20px;
+    }
+
+    .fs12{
+      font-size: 12px !important;
+    }
+
+    .fs10{
+      font-size: 10px !important;
+    }
+
+    .text-center{
+      text-align: center;
+    }
+
+    .d-flex{
+      display: flex;
+    }
+
+    .justify-content-between{
+      justify-content: space-between;
+    }
+
+    .justify-content-center{
+      justify-content: center;
+    }
+
+    .w100{
+      width: 100%;
+    }
+
+    .w80{
+      width: 80%;
+    }
+
+    .w50{
+      width: 50%;
+    }
+
+    .imgDiv{
+      width: 100px;
+      height: 100px;
+    }
+
+    th,td{
+      text-align: left;
+    }
+
+    .border{
+      border: 1px solid black;
+    }
+
+    .border-left{
+      border-left: 1px solid black;
+    }
+
+    .transform{
+      margin-top: -20px;
+      margin-left: 40px;
+      padding: 5px;
+      background-color: white;
+      width: fit-content;
+    }
+
+    .p10{
+      padding: 10px;
+    }
+
+    .mb10{
+      margin-bottom: 10px;
+    }
+
+    .mt120{
+      margin-top: 120px;
+    }
+
+    .mt10{
+      margin-top: 10px;
+    }
+
+    .mt5{
+      margin-top: 5px;
+    }
+
+    .pl25{
+      padding-left: 25px !important;
+    }
+    
+    .pl5{
+      padding-left: 5px !important;
+    }
+
+    .break-address {
+      word-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
+    }
+
+    @media print{
+      @page{
+        padding: 0px;
+        margin: 0px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div>
+      <div class="w100">
+        <p class="text-center">{{companyName}}</p>
+        <div class="d-flex justify-content-center">
+          <p class="text-center break-address fs10 w50">{{address}}</p>
+        </div>
+        <!-- <p class="text-center">Senapati Bapat Road, Prabhadevi, Mumbai - 400 013</p>
+        <p class="text-center">Tel.: 022-433236218 | Email: mlwbcomteg@gmail.com</p> -->
+      </div>
+    </div>
+
+    <div class="d-flex mb10 mt10">
+      <p class="w100 fs10 pl5">Subject to Realisation of Payment</p>
+      <p class="w100 fs10 pl5">RECEIPT</p>
+    </div>
+    <div class="d-flex border">
+      <div class="to-section w100 p10">
+        <p class="transform">To</p>
+        <p></p>
+        <p>{{companyName}}
+           {{#if branchName}} 
+          ({{branchName}})
+        {{/if}}</p>
+        <p>{{address}}</p>
+        <!-- <p>WALUJ</p>
+        <p>AURANGABAD-431136</p> -->
+      </div>
+      
+      <div class="w100 p10 border-left">
+        <table class="details">
+          <tr>
+            <td>Rec. No.</td>
+            <td class="pl25"></td>
+          </tr>
+          <tr>
+            <td>Rec. Dt.</td>
+            <td class="pl25">{{date}}</td>
+          </tr>
+          <tr>
+            <td>By</td>
+            <td class="pl25">ONLINE PAYMENT</td>
+          </tr>
+          <tr>
+            <td>Total Rs. in words</td>
+            <td class="pl25">{{inWords}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <p class="text-center fs12 mt10">
+        Received from the above Establishment Employee's and Employer's Contribution, With interest as per details below:
+    </p>
+
+    <div class="d-flex w80 justify-content-between mt10">
+      <p>Refer/Chq/DD No.: </p>
+      <p>Refer/Chq/DD Date: {{date}}</p>
+      <p>Amount: {{totalAmount}}</p>
+      <p>Bank:</p>
+    </div>
+
+    <div class="d-flex border mt5">
+      <div class="w100 d-flex justify-content-between text-center p10 fs12">
+        <div>
+          <p>Slab No.</p>
+          <p>{{slab}}</p>
+        </div>
+        <div>
+          <p>Period</p>
+          <p>{{period}}</p>
+        </div>
+        <div>
+          <p>Emp</p>
+          <p>{{employeeCount}}</p>
+        </div>
+        <div>
+          <p>EEC</p>
+          <p>{{employeeAmount}}</p>
+        </div>
+        <div>
+          <p>ERC</p>
+          <p>{{employerAmount}}</p>
+        </div>
+        <div>
+          <p>P/I</p>
+          <p>0.00</p>
+        </div>
+      </div>
+      <div class="w100 border-left">
+
+      </div>
+    </div>
+
+    <div class="mt120 d-flex justify-content-between p10">
+      <p>
+        HR Signature
+      </p>
+      <p>
+        Authorized Person Signature
+      </p>
+      <p>
+        Accountant Signature
+      </p>
+    </div>
+  </div>
+</body>
+</html>

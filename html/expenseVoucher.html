@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voucher</title>
+    <style>
+        .container {
+            margin: auto;
+            max-width: 800px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .footer .d-flex p {
+            width: 100%;
+        }
+
+        .border-bottom {
+            border-bottom: 1px solid black;
+        }
+
+        .w-50 {
+            width: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>{{companyName}}</th>
+                    </tr>
+                    <tr>
+                        <td class="text-center">{{companyAddress}}</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">{{month}}</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>
+                                    Sr No.
+                                </th>
+                                <th>
+                                    Date of Expense
+                                </th>
+                                <th>
+                                    Expense Category
+                                </th>
+                                <th>
+                                    Expense Head
+                                </th>
+                                <th>
+                                    Total Amount
+                                </th>
+                            </tr>
+                            {{#each expenseData}}
+                            <tr>
+                                <td class="text-center">{{this.index}}</td>
+                                <td class="text-center">{{this.expenseDate}}</td>
+                                <td class="text-center">{{this.expenseCategory}}</td>
+                                <td class="text-center">{{this.expenseHead}}</td>
+                                <td class="text-right">{{this.expenseAmount}}</td>
+                            </tr>
+                            {{/each}}
+                            <tr>
+                                <th colspan="4">
+                                    Total
+                                </th>
+                                <td colspan="4" class="text-right">
+                                    {{totalExpenseAmount}}
+                                </td>
+                            </tr>
+                            <!-- <tr>
+                                <td colspan="5"></td>
+                            </tr> -->
+                        </thead>
+                    </table>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <div class="d-flex">
+                <p class="m-0 border-bottom">
+                    <b>Employee Name</b> {{employeeName}}
+                </p>
+                <p class="m-0 border-bottom">
+                    <b>Signature</b>
+                </p>
+            </div>
+            {{#if projectName}}
+            <div>
+                <p class="m-0 border-bottom w-50">
+                    <b>Project Name:</b> {{projectName}}
+                </p>
+            </div>
+            {{/if}}
+            <div>
+                <p class="m-0 border-bottom w-50">
+                    <b>Voucher No:</b> {{userExpenseID}}
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,264 @@
+<!-- <!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offer Letter</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+
+      .main {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 150px;
+        width: 75%;
+        background-color: lightgray;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .nested {
+        text-align: center;
+        font-family: Arial, sans-serif;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="main">
+      <div class="nested">
+        <div>
+          <img
+            class="logo"
+            style="max-height: 70px; max-width: 200px; margin-top: 3%"
+            src="{{base64}}"
+            alt="Company Logo"
+          />
+        </div>
+        <div style="font-size: 18px !important; margin-top: 5px">
+          {{companyName}}
+        </div>
+        <div style="font-size: 10px !important; margin-top: 3px">
+          {{companyAddress}}
+        </div>
+        <div
+          style="
+            margin-top: 1px;
+            padding-bottom: 10px;
+            font-size: 10px !important;
+          "
+        >
+          <b>Contact:</b> {{cpMobileNo}}
+          &nbsp;&nbsp;<b>Email:</b>{{companyEmail}} &nbsp;&nbsp;
+          {{companyWebsite}}
+        </div>
+        <div
+          style="
+            margin-top: 1px;
+            width: 540px !important;
+            border-bottom: solid thin;
+          "
+        ></div>
+      </div>
+    </div>
+  </body>
+</html> -->
+
+<!-- <!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offer Letter</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        /* Remove body margin */
+      }
+
+      table {
+        border-collapse: collapse;
+        /* border: 1px solid black; */
+        margin: 0 auto;
+        width: 80%;
+        padding: 0;
+        /* Remove table padding */
+      }
+
+      th,
+      td {
+        padding: 0;
+        /* Remove cell padding */
+        /* border: 1px solid black; */
+      }
+
+      img.logo {
+        display: block;
+        /* Make image behave like a block element */
+        margin: 0 auto;
+        /* Center the image */
+        max-height: 70px;
+        max-width: 200px;
+        margin-top: 3%;
+      }
+
+      div {
+        margin-top: 0;
+        /* Remove margin from div elements */
+        padding-bottom: 0;
+        /* Remove padding from div elements */
+        text-align: center;
+      }
+
+      tr:last-child {
+        border-bottom: 1px solid black;
+      }
+    </style>
+  </head>
+
+  <body>
+    <table>
+      <tr>
+        <td>
+          <img class="logo" src="{{base64}}" alt="Company Logo" />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-size: 16px !important; margin-top: 5px">
+            {{companyName}}
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-size: 8px !important; margin-top: 3px">
+            {{companyAddress}}
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div
+            style="
+              margin-top: 1px;
+              padding-bottom: 10px;
+              font-size: 8px !important;
+            "
+          >
+            <b>Contact:</b> {{cpMobileNo}}
+            &nbsp;&nbsp;<b>Email:</b>{{companyEmail}}
+            &nbsp;&nbsp;{{companyWebsite}}
+          </div>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html> -->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offer Letter</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+      }
+
+      table {
+        border-collapse: collapse;
+        margin: 0 auto;
+        width: 80%;
+        padding: 0;
+      }
+
+      th,
+      td {
+        padding: 0;
+      }
+
+      img.logo {
+        display: block;
+        margin: 0 auto;
+        max-height: 70px;
+        max-width: 200px;
+        margin-top: 3%;
+      }
+
+      .logo-placeholder {
+        display: block;
+        margin: 0 auto;
+        height: 70px;
+        width: 200px;
+        margin-top: 3%;
+        background-color: lightgray;
+        /* Placeholder background color */
+      }
+
+      div {
+        margin-top: 0;
+        padding-bottom: 0;
+        text-align: center;
+      }
+
+      tr:last-child {
+        border-bottom: 1px solid black;
+      }
+    </style>
+  </head>
+
+  <body>
+    <table>
+      <tr>
+        <td>
+          {{#if base64}}
+          <img class="logo" src="{{base64}}" alt="Company Logo" />
+          {{else}}
+          <div class="logo-placeholder"></div>
+          {{/if}}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-size: 16px !important; margin-top: 5px">
+            {{companyName}}
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div style="font-size: 12px !important; margin-top: 3px">
+            {{companyAddress}}
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div
+            style="
+              margin-top: 1px;
+              padding-bottom: 10px;
+              font-size: 12px !important;
+            "
+          >
+            <b>Contact :</b> {{cpMobileNo}}
+            &nbsp;&nbsp;<b>Email :</b> {{companyEmail}}
+            &nbsp;&nbsp;{{companyWebsite}}
+          </div>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

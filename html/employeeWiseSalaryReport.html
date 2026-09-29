@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Employee Salary Report</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        font-size: 10px;
+      }
+      table {
+        border-collapse: collapse;
+        page-break-inside: avoid;
+      }
+      table, th, td {
+        border: 1px solid #aaaaaa;
+      }
+      th, td {
+        padding: 8px;
+        text-align: center;
+      }
+      .footer {
+        text-align: center;
+        margin-top: 20px;
+        font-weight: bold;
+      }
+      .d-flex{
+        display: flex;
+      }
+      .justify-content-between{
+        justify-content: space-between;
+      }
+      .m0{
+        margin: 0px;
+      }
+      .ml10{
+        margin-left: 10px;
+      }
+      .mt15{
+        margin-top: 15px;
+      }
+      .mt5{
+        margin-top: 5px;
+      }
+      .ml15{
+        margin-left: 15px;
+      }
+      .mb10{
+        margin-bottom: 10px;
+      }
+      hr{
+        margin: 20px auto 15px;
+        background-color: #e6e3e3;
+      }
+      .fs12{
+        font-size: 12px;
+      }
+      .fs16{
+        font-size: 16px;
+      }
+      .avoid-page-break{
+        page-break-inside: avoid;
+      }
+    </style>
+  </head>
+  <body>
+    <p style="text-align: center;" class="fs16">Employee Month Wise Salary Report</p>
+
+    {{#each data}}
+      <div class="main mt10">
+        <div class="salaryData d-flex mt15 justify-content-between">
+          <div class="fs12 avoid-page-break">
+            <b>Employee Code : </b>
+            <br>
+            <p class="m0 mt5">{{employeeCode}}</p>
+          </div>
+          <div class="fs12 avoid-page-break">
+            <b>Employee Name : </b>
+            <br>
+            <p class="m0 mt5">{{displayName}}</p>
+          </div>
+          <div class="fs12 avoid-page-break">
+            <b>Number : </b>
+            <p class="m0 mt5">{{userNumber}}</p>
+          </div>
+          <div class="fs12 avoid-page-break">
+            <b>Branch : </b>
+            <p class="m0 mt5">{{branch}}</p>
+          </div>
+          <div class="fs12 avoid-page-break">
+            <b>Department : </b>
+            <p class="m0 mt5">{{department}}</p>
+          </div>
+          <div class="fs12 avoid-page-break">
+            <b>Designation : </b>
+            <p class="m0 mt5">{{designation}}</p>
+          </div>
+          <div class="fs12 avoid-page-break">
+            <b>Joining Date : </b>
+            <p class="m0 mt5">{{joiningDate}}</p>
+          </div>
+        </div>
+        {{#if salaryData.length}}
+          {{#each salaryData}}
+            <div class="d-flex">
+              <p class="mt15 mb10"><b>Salary Month: </b>{{salaryFromYYYYMM}}</p>
+              <p class="ml15 mt15 mb10"><b>Salary Scale: </b>{{salaryScale.EmployeeSalaryAmount}}</p>
+              <p class="ml15 mt15 mb10"><b>Days: </b>{{days}}</p>
+            </div>
+            <div>
+              <table>
+                <tr>
+                  {{#each achildData}}
+                  <td>{{#if payheadDisplayName}}{{payheadDisplayName}}{{else}}{{payheadName}}{{/if}}</td>
+                  {{/each}}
+
+                  {{#if grossData}} 
+                  <td><b>{{#if grossData.payheadDisplayName}}{{grossData.payheadDisplayName}}{{else}}{{grossData.payheadName}}{{/if}}</b></td>
+                  {{/if}}
+
+                  {{#each bchildData}}
+                  <td>{{#if payheadDisplayName}}{{payheadDisplayName}}{{else}}{{payheadName}}{{/if}}</td>
+                  {{/each}}
+
+                  {{#each extra_achild}}
+                    <td>{{#if payheadDisplayName}}{{payheadDisplayName}}{{else}}{{payheadName}}{{/if}}</td>
+                  {{/each}}
+
+                  {{#if netPayData}} 
+                  <td><b>{{#if netPayData.payheadDisplayName}}{{netPayData.payheadDisplayName}}{{else}}{{netPayData.payheadName}}{{/if}}</b></td>
+                  {{/if}}
+                </tr>
+                <tr>
+                  {{#each achildData}}
+                    <td>{{EmployeeSalaryAmount}}</td>
+                  {{/each}}
+
+                  {{#if grossData}} 
+                    <td><b>{{grossData.EmployeeSalaryAmount}}</b></td>
+                  {{/if}}
+
+                  {{#each bchildData}}
+                    <td>{{EmployeeSalaryAmount}}</td>
+                  {{/each}}
+
+                  {{#each extra_achild}}
+                    <td>{{EmployeeSalaryAmount}}</td>
+                  {{/each}}
+
+                  {{#if netPayData}} 
+                    <td><b>{{netPayData.EmployeeSalaryAmount}}</b></td>
+                  {{/if}}
+                </tr>
+              </table>
+            </div>
+          {{/each}}
+        {{else}}
+          <p><b>No salary data found!</b></p>
+        {{/if}}
+
+        <!-- {{#if salaryData}} -->
+          <div class="mt15">
+            <div class="d-flex">
+              <p class="mt15 mb10"><b>Total Salary: </b></p>
+            </div>
+            <div>
+              <table>
+                <tr>
+                  {{#each total.achildSum}}
+                  <td>{{#if payheadDisplayName}}{{payheadDisplayName}}{{else}}{{payheadName}}{{/if}}</td>
+                  {{/each}}
+
+                  {{#if total.grossSum}} 
+                    <td><b>{{#if total.grossSum.payheadDisplayName}}{{total.grossSum.payheadDisplayName}}{{else}}{{total.grossSum.payheadName}}{{/if}}</b></td>
+                  {{/if}}
+
+                  {{#each total.bchildSum}}
+                  <td>{{#if payheadDisplayName}}{{payheadDisplayName}}{{else}}{{payheadName}}{{/if}}</td>
+                  {{/each}}
+
+                  {{#each total.extraAChildSum}}
+                  <td>{{#if payheadDisplayName}}{{payheadDisplayName}}{{else}}{{payheadName}}{{/if}}</td>
+                  {{/each}}
+
+                  {{#if total.netPaySum}} 
+                    <td><b>{{#if total.netPaySum.payheadDisplayName}}{{total.netPaySum.payheadDisplayName}}{{else}}{{total.netPaySum.payheadName}}{{/if}}</b></td>
+                  {{/if}}
+                </tr>
+                <tr>
+                  {{#each total.achildSum}}
+                    <td>{{EmployeeSalaryAmount}}</td>
+                  {{/each}}
+
+                  {{#if total.grossSum}} 
+                    <td><b>{{total.grossSum.EmployeeSalaryAmount}}</b></td>
+                  {{/if}}
+
+                  {{#each total.bchildSum}}
+                    <td>{{EmployeeSalaryAmount}}</td>
+                  {{/each}}
+
+                  {{#each total.extraAChildSum}}
+                    <td>{{EmployeeSalaryAmount}}</td>
+                  {{/each}}
+
+                  {{#if total.netPaySum}} 
+                    <td><b>{{total.netPaySum.EmployeeSalaryAmount}}</b></td>
+                  {{/if}}
+                </tr>
+              </table>
+            </div>
+          </div>
+          
+          <!-- {{/if}} -->
+        </div>
+        <hr>
+    {{/each}}
+</body>
+
+</html>

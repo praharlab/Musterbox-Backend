@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{letterName}}</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.8 !important;
+      }
+
+      h1,
+      h2,
+      h3.h4.h5,
+      h6,
+      div,
+      span,
+      p {
+        margin: 0px !important;
+      }
+
+      .main1 {
+        font-size: 14px !important;
+        font-family: Arial, sans-serif !important;
+      }
+
+      table {
+        border: 1px solid black;
+        margin: 0 auto;
+      }
+
+      th,
+      td {
+        /* Remove cell padding */
+        border: 1px solid black;
+      }
+
+      .pageBreak {
+        page-break-before: always !important;
+        page-break-inside: avoid !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    {{content}}
+  </body>
+</html>

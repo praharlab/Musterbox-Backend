@@ -1,0 +1,250 @@
+<html lang="en">
+
+<head>
+  <title>Book Face</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      font-family: 'Nunito', sans-serif;
+      letter-spacing: 0.3px;
+      font-size: 10px;
+    }
+
+    .companyLogo {
+      object-fit: contain;
+      background: transparent;
+      border-radius: 15px;
+      height: 50px !important;
+      mix-blend-mode: darken;
+    }
+
+    .profile-pic {
+      height: 130px !important;
+      width: 130px !important;
+      background-color: #ebfcdc;
+      color: #00853e;
+      border-radius: 15px;
+      object-fit: content;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 32px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .signature {
+      position: absolute !important;
+      bottom: 0px !important;
+      right: 0px !important;
+    }
+
+    .signatureImage {
+      height: 40px;
+      width: 100px;
+      background: transparent;
+      mix-blend-mode: darken !important;
+    }
+
+    .manageAddress {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .space-no-wrap {
+      white-space: nowrap;
+    }
+
+    table {
+      background: transparent !important;
+      mix-blend-mode: darken;
+    }
+
+    tr,
+    td {
+      border: none !important;
+      background: transparent !important;
+      mix-blend-mode: darken;
+      vertical-align: top;
+    }
+
+    .fs12 {
+      font-size: 12px;
+    }
+
+    .fs14 {
+      font-size: 14px;
+    }
+
+    .fw600 {
+      font-weight: 600;
+    }
+
+    .p10 {
+      padding: 10px !important;
+    }
+
+    .mt10 {
+      margin-top: 10px;
+    }
+
+    .mt5 {
+      margin-top: 5px !important;
+    }
+
+    .mt80 {
+      margin-top: 80px;
+    }
+
+    .w80 {
+      width: 80% !important;
+    }
+
+    .pb5 {
+      padding-bottom: 5px !important;
+    }
+
+    .m10 {
+      margin: 10px !important;
+    }
+
+    .mr10 {
+      margin-right: 10px !important;
+    }
+
+    .ml30 {
+      margin-left: 30px !important;
+    }
+
+    .mt80 {
+      margin-top: 80px !important;
+    }
+
+    @media print {
+      @page {
+        padding: 0px 0px !important;
+      }
+
+      .col-6 {
+        page-break-inside: avoid !important;
+      }
+    }
+  </style>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div #screen class="row m-0 p-0">
+    {{#each tempData}}
+    <div class="col-6 m-0 p-0">
+      <div class="d-flex p10 position-relative">
+        <div class="w80">
+          <div class="d-flex justify-content-center">
+
+            <div>
+              <img class="companyLogo" src="{{this.ApiURL}}css/assets/asopalavlogo.png" />
+            </div>
+
+          </div>
+          <div>
+            {{#if this.idCardData.companyNameLength}}
+            <div class="text-center">
+              <b class="fs14">{{ this.idCardData.companyName }}</b>
+            </div>
+            {{else}}
+            <div class="text-center">
+              <b class="fs14">{{ this.idCardData.companyName }}</b>
+            </div>
+            {{/if}}
+          </div>
+          <div>
+            <div class="d-flex justify-content-center mt5">
+              {{#if this.idCardData.userPhoto}}
+              <img class="profile-pic" src="{{this.ApiURL}}uploads/user/photo/{{ this.idCardData.userPhoto }}" alt="" />
+              {{else}}
+              <div class="profile-pic">
+                {{this.idCardData.profilePicName}}
+              </div>
+              {{/if}}
+            </div>
+            <div class="mt5">
+              <div>
+                <p class="text-center p-0 m-0 fs12">
+                  <b> {{ this.idCardData.userDisplayName }} </b>
+                </p>
+              </div>
+              <div class="m-0">
+                {{#if this.idCardData.designationName}}
+                <p class="text-center m-0 fs12">
+                  {{ this.idCardData.designationName }}
+                </p>
+                {{/if}}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="w-100">
+          <div>
+            <div class="w-100">
+              {{#if this.idCardData.employeeCode}}
+              <p class="m-0 text-right">
+                <b>{{ this.idCardData.employeeCode }}</b>
+              </p>
+              {{/if}}
+            </div>
+            <table class="mt80">
+              <tr>
+                <td><b>Department</b></td>
+                <td>&nbsp;:&nbsp;&nbsp;&nbsp;</td>
+                <td> {{ this.idCardData.departmentName }} </td>
+              </tr>
+              <tr>
+                <td><b>Mobile No</b></td>
+                <td>&nbsp;:&nbsp;&nbsp;&nbsp;</td>
+                <td> {{ this.idCardData.userNumber }} </td>
+              </tr>
+              <tr>
+                <td><b>Emergency Number</b></td>
+                <td>&nbsp;:&nbsp;&nbsp;&nbsp;</td>
+                <td><b>{{ this.idCardData.otherContactNumber }} </b></td>
+              </tr>
+              <tr>
+                <td><b>Date Of Birth</b></td>
+                <td>&nbsp;:&nbsp;&nbsp;&nbsp;</td>
+                <td> {{ this.idCardData.dob }} </td>
+              </tr>
+              <tr>
+                <td><b>Blood Group</b></td>
+                <td>&nbsp;:&nbsp;&nbsp;&nbsp;</td>
+                <td> {{ this.idCardData.bloodgroup }} </td>
+              </tr>
+            </table>
+          </div>
+          <div class="w-100 d-flex justify-content-end signature">
+            <div class="mr10 ml30">
+              {{#if this.idCardData.authorizedSignature}}
+              <img class="signatureImage"
+                src="{{this.ApiURL}}uploads/company/signature/{{this.idCardData.authorizedSignature}}" alt="" />
+              {{else}}
+              <div class="signatureImage"></div>
+              {{/if}}
+              <p class="fs12 fw600">Authorized Signature</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+
+  <script src="./bootstrap.js"></script>
+  <script src="./jquery.js"></script>
+  <script src="./popper.js"></script>
+</body>
+
+</html>

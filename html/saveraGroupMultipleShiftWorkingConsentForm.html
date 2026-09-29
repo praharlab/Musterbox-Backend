@@ -1,0 +1,89 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <title>Consent Form</title>
+    <style>
+        * {
+            font-family: "Noto Sans Devanagari", serif;
+        }
+
+        .container {
+            max-width: 880px;
+            margin: auto;
+            border: 1px solid black;
+        }
+
+        .heading {
+            border-bottom: 1px solid black;
+            text-align: center;
+        }
+
+        .date {
+            text-align: right;
+        }
+
+        .p10 {
+            padding: 10px;
+        }
+
+        .border {
+            border: 1px solid black;
+        }
+
+        .footer {
+            text-align: right;
+            padding-right: 100px;
+        }
+
+        .bt0 {
+            border-top: 1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="heading">
+            <h2>
+                दुसऱ्या शिफ्टमध्ये काम करण्यासाठी संमती
+            </h2>
+        </div>
+        <div class="p10">
+            <p class="date">Date of Joining: {{userDateOfJoining}}</p>
+
+            <p>प्रति.</p>
+            <p>Mr/Mrs/Miss. {{userName}} ({{usersContractorName}})</p>
+            <p>१) मी दुसऱ्या शिफ्टमध्ये (१४:३० ते २३:००) काम करण्यास तयार आहे.</p>
+            <p>२) माझ्यासाठी दुसऱ्या शिफ्टमध्ये काम करण्यासाठी अशी कोणतीही समस्या नाही जी या शिफ्टमध्ये काम करण्यास
+                समस्या निर्माण करू शकते.</p>
+            <p>३) मुलाखतीच्या वेळी मला कंपनीने दुसऱ्या शिफ्टमध्ये काम करणाऱ्या महिलांसाठी घेतलेल्या सुरक्षेकच्या खबरदारी
+                बद्दल माहिती दिली आहे.</p>
+            <p>४) कंपनीने महिला सुरक्षा रक्षकासह वाहतूक सुविधा मोफत दिली आहे आणि मला सांगण्यात आले आहे की जर माझे घर
+                ड्रॉपिंग पॉईंटपासून खूप दूर असेल आणि माझे कुटूंबातील सदस्य मला नेण्यास असमर्थ असतील तर लेडी
+                सिक्युरिटी गार्ड घरापर्यंत सोडेल.</p>
+            <p>५) आपत्कालीन परिस्थितीत कृपया माझ्या कुटुंबातील सदस्यांच्या खालील क्रमांकावर संपर्क साधा</p>
+            <br>
+            <p>नाव: <b>Mr/Mrs/Miss. {{userName}}</b></p>
+            <p>पत्ता: {{userPermanentAddress}} {{userPermanentAddressMarathi}}</p>
+            <p>इ. संबंध: ___________________.</p>
+            <p>मोबाईल क्रमांक : {{userNumber}}</p>
+            <p>पर्यायी क्रमांक: ___________________.</p>
+            <p>६) मी मुक्तपणे आणि कोणत्याही दबावाशिवाय संमती दिली आहे.</p>
+            <br><br>
+            <p>कामगाराची नाव आणि स्वाक्षरी:</p>
+            <p><b>{{userName}}</b></p>
+            <br><br>
+            <p class="footer"><b>{{userFatherName}}</b></p>
+            <p class="footer">कुटुंबातील सदस्य । वडील / पतीचे नाव आणि स्वाक्षरी</p>
+        </div>
+        <!-- <div class="bt0 p10"></div>
+            <div class="bt0 p10"></div> -->
+    </div>
+</body>
+
+</html>

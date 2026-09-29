@@ -1,0 +1,317 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <title>
+        Payslip
+    </title>
+    <style>
+        * {
+            font-family: "Noto Sans Devanagari", serif;
+        }
+
+        .container {
+            max-width: 880px;
+            margin: auto;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        table {
+            margin: 0px;
+            padding: 0px;
+            border-collapse: collapse;
+        }
+
+        .m0 {
+            margin: 0px;
+        }
+
+        .m5 {
+            margin: 5px;
+        }
+
+        .p0 {
+            padding: 0px !important;
+        }
+
+        .border-top-bottom {
+            border: 1px solid black;
+        }
+
+        .border {
+            border: 1px solid black;
+            border-radius: 15px !important;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .justify-space-between {
+            justify-content: space-between;
+        }
+
+        .w100 {
+            width: 100%;
+        }
+
+        .border tr {
+            width: 100% !important;
+        }
+
+        .border td table tbody tr td {
+            padding: 5px;
+        }
+
+        .br {
+            border-right: 1px solid black;
+        }
+
+        .br0 {
+            border-right: none !important;
+        }
+
+        .blnone {
+            border-left: none !important;
+        }
+
+        .border-radius {
+            border-radius: 10px !important;
+        }
+
+        .fs14 {
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div>
+            <h2 class="text-center m5">{{usersContractorName}}</h2>
+            <p class="text-center m5 fs14">{{usersContractorAddress}}</p>
+            <p>
+                <b>Payslip for the Month Of {{month}}-{{year}}</b>
+            </p>
+        </div>
+        <table class="w100" style="border: 1px solid blue;">
+            <tbody>
+                <tr class="border border-radius">
+                    <td class="p0">
+                        <table class="w100">
+                            <tbody>
+                                <tr>
+                                    <td><b>Emp Code</b></td>
+                                    <td>{{employeecode}}</td>
+                                    <td><b>Branch</b></td>
+                                    <td>{{branch}}</td>
+                                    <td><b>PF UAN NO</b></td>
+                                    <td>{{pfNumber}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Emp Name</b></td>
+                                    <td>{{employeename}}</td>
+                                    <td><b>Dept.</b></td>
+                                    <td>{{department}}</td>
+                                    <td><b>ESIC NO</b></td>
+                                    <td>{{esicNumber}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b></b></td>
+                                    <td>{{pancard}}</td>
+                                    <td><b>Desig.</b></td>
+                                    <td>{{designation}}</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td><b>Bank AC No</b></td>
+                                    <td>{{userbankAccountNo}}</td>
+                                    <td><b>Bank Name</b></td>
+                                    <td>{{userbankName}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr class="border border-radius">
+                    <td class="p0">
+                        <table style="width: 60%;">
+                            <tbody>
+                                <tr>
+                                    <td><b>Present</b></td>
+                                    <td><b>{{presentday}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Absent</b></td>
+                                    <td><b>{{unpaidleave}}</b></td>
+                                    <td><b>OD</b></td>
+                                    <td><b>{{outDoorDuty}}</b></td>
+                                    <td><b>CO</b></td>
+                                    <td><b>{{compensatoryOff}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Woff</b></td>
+                                    <td><b>{{weekoff}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Paid Holiday</b></td>
+                                    <td><b>{{holiday}}</b></td>
+                                    <td><b>Payable Day</b></td>
+                                    <td><b>{{payableDays}}</b></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr class="border border-radius">
+                    <td class="p0">
+                        <table class="w100">
+                            <tbody>
+                                <tr>
+                                    <td class="p0">
+                                        <table class="w100">
+                                            <tbody>
+
+
+                                                <tr>
+                                                    <td colspan="2" class="border text-center"><b>Salary Structure /
+                                                            पगाराची रचना</b></td>
+                                                    <td colspan="2" class="border text-center"><b>Earning / कमाई</b>
+                                                    </td>
+                                                </tr>
+                                                {{#each earning}}
+                                                <tr>
+                                                    {{#if
+                                                    (and
+                                                    (eq this.salaryfieldside 'E') (eq this.salaryfieldshow 'Y')
+                                                    )
+                                                    }}
+                                                    <td>{{this.payheadName}}</td>
+                                                    {{/if}}
+                                                    {{#if
+                                                    (and
+                                                    (eq this.salaryfieldside 'E') (eq this.salaryfieldshow 'Y')
+                                                    )
+                                                    }}
+                                                    <td class="br text-right"><b>{{this.actualamount}}</b></td>
+                                                    {{/if}}
+                                                    {{#if
+                                                    (and
+                                                    (eq this.salaryfieldside 'E') (eq this.salaryfieldshow 'Y')
+                                                    )
+                                                    }}
+                                                    <td colspan="2" class="text-right br"><b>{{this.employeeAmount}}</b>
+                                                    </td>
+                                                    {{/if}}
+                                                </tr>
+                                                {{/each}}
+                                                <tr>
+                                                    <td class="border"><b>Total Earning (एकूण कमाई)</b></td>
+                                                    <td class="br border text-right"><b>{{totalactualearning}}</b></td>
+                                                    <td colspan="2" class="text-right border"><b>{{totalearning}}</b>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                    <td class="p0">
+                                        <table class="w100">
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="2" class="border text-center"><b>Deduction / वजावट</b>
+                                                    </td>
+                                                </tr>
+                                                {{#each deduction}}
+                                                <tr>
+                                                    {{#if (and (eq this undefined))}}
+
+                                                    <td class='head'>
+                                                        &nbsp;
+                                                    </td>
+                                                    {{/if}}
+
+                                                    {{#if
+                                                    (and
+                                                    (eq this.salaryfieldside 'D') (eq this.salaryfieldshow 'Y')
+                                                    )
+                                                    }}
+                                                    <td>{{this.payheadName}}</td>
+                                                    {{/if}}
+                                                    {{#if
+                                                    (and
+                                                    (eq this.salaryfieldside 'D') (eq this.salaryfieldshow 'Y')
+                                                    )
+                                                    }}
+                                                    <td class="text-right"><b>{{this.employeeAmount}}</b></td>
+                                                    {{/if}}
+                                                </tr>
+                                                {{/each}}
+                                                <tr>
+                                                    <td class="border br0"><b>Total Deduction (एकूण वजावट)</b></td>
+                                                    <td class="border blnone text-right br0"><b>{{totaldeduction}}</b>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr class="border border-radius">
+                    <td class="p0">
+                        <table class="w100">
+                            <tbody>
+                                <tr>
+                                    <td><b>Net Pay / निव्वळ वेतन</b></td>
+                                    <td><b>{{nettotal}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Net Pay in word (शब्दात निव्वळ पगार)</b></td>
+                                    <td>{{numberTextMarathi}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Note</b></td>
+                                    <td>THIS PAYSLIP IS COMPUTER GENERATED NO SIGNATURE IS REQUIRED.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr class="border border-radius">
+                    <td class="p0">
+                        <table class="w100">
+                            <tbody>
+                                <tr class="d-flex justify-space-between">
+                                    <td><span><b>Leave Balance :</b></span></td>
+                                    <td>CL = {{remainingBalance_CL}}</td>
+                                    <td>SL = {{remainingBalance_SL}}</td>
+                                    <td>PL = {{remainingBalance_PL}}</td>
+                                    <td>OD = {{remainingBalance_OD}}</td>
+                                    <td>CO = {{remainingBalance_CO}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>

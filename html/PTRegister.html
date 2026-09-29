@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0px;
+            padding: 0px;
+            box-sizing: border-box;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 10px;
+        }
+
+        .container {
+            max-width: 850px;
+            padding: 20px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .justify-content-between {
+            justify-content: space-between;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        thead tr th {
+            border: 1px solid black;
+            border-left: 0px !important;
+            border-right: 0px !important;
+        }
+
+        th,
+        td {
+            padding: 5px;
+        }
+
+        .border-top {
+            border-top: 1px solid black;
+        }
+
+        .border-bottom {
+            border-bottom: 1px solid black;
+        }
+
+        .fs12 {
+            font-size: 12px !important;
+        }
+
+        .fs16 {
+            font-size: 16px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container text-center" style="margin: auto;">
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <td colspan="5">
+                            <p><b class="fs16">{{companyName}}</b></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">
+                            <p class="fs12">{{companyAdd}}</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <b>PT Code : {{stateName}}</b>
+                                </div>
+                                <div class="fs12">Profession Tax Register For The Month Of <b class="fs12">{{month}}</b> </div>
+                                <div></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Sr.No</th>
+                        <th>Code</th>
+                        <th class="text-left">Employee Name</th>
+                        <th>PT Salary</th>
+                        <th>P Tax</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each data}}
+                    <tr>
+                        <td>{{SrNo}}</td>
+                        <td>{{EmployeeCode}}</td>
+                        <td class="text-left">{{EmployeeName}}</td>
+                        <td>{{Salary}}</td>
+                        <td>{{PT}}</td>
+                    </tr>
+                    {{/each}}
+                    <tr>
+                        <td class="border-top"></td>
+                        <td class="border-top"></td>
+                        <td class="border-top"><b>Total</b></td>
+                        <td class="border-top"><b>{{totalData.Total_salary}}</b></td>
+                        <td class="border-top"><b>{{totalData.Total_PT}}</b></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table style="border: 1px solid black;">
+                <tbody>
+                    <tr>
+                        <td colspan="6">
+                            <h4 class="text-left">Profession Tax Summary</h4>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="border-bottom text-left"><b>PT Slab</b></td>
+                        <td class="border-bottom"><b>PT</b></td>
+                        <td class="border-bottom"><b>Gender</b></td>
+                        <td class="border-bottom"><b>Total Emp</b></td>
+                        <td class="border-bottom"><b>Total Salary</b></td>
+                        <td class="border-bottom"><b>Total PT</b></td>
+                    </tr>
+                    {{#each summaryData}}
+                    <tr>
+                        <td class="text-left">
+                            Salary >= {{fromAmount}} AND <= {{toAmount}} </td>
+                        <td>{{pt}}</td>
+                        <td>{{gender}}</td>
+                        <td>{{totalEmployee}}</td>
+                        <td>{{totalSalary}}</td>
+                        <td>{{total_PT}}</td>
+                    </tr>
+                    {{/each}}
+                    <tr>
+                        <td class="border-top"><b>Total</b></td>
+                        <td class="border-top"><b>{{totalData.PT}}</b></td>
+                        <td class="border-top"></td>
+                        <td class="border-top"><b>{{totalData.Total_emp}}</b></td>
+                        <td class="border-top"><b>{{totalData.Total_salary}}</b></td>
+                        <td class="border-top"><b>{{totalData.Total_PT}}</b></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" class="text-left border-top"><b>Total No. of Employee excluding Zero PT
+                                &nbsp;&nbsp;&nbsp; {{totalData.Exclude_PT_ZERO}}</b></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

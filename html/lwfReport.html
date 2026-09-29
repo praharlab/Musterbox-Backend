@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Document</title>
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      th,
+      td {
+        border: 1px solid black;
+        padding: 4px;
+      }
+
+      .row1 {
+        display: flex;
+      }
+
+      .row1 > div {
+        flex: 1;
+      }
+
+      @page {
+        size: A4;
+        margin: 5mm;
+      }
+
+      @media print {
+        html,
+        body {
+          width: 210mm;
+          height: 285mm;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Montserrat', sans-serif;
+      }
+
+      .content {
+        padding: 5px;
+      }
+
+      .form-title {
+        text-align: center;
+        font-size: 14px;
+        font-family: monospace;
+        font-weight: 600;
+        margin-bottom: 3px;
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 12px;
+        font-family: monospace;
+        font-weight: 600;
+        margin-bottom: 3px;
+      }
+
+      .account-no {
+        text-align: center;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 2px 0;
+      }
+
+      .col-md1-5 {
+        flex: 0 0 50%;
+      }
+
+      .col-md1-7 {
+        flex: 0 0 50%;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+
+  <body
+    lang="EN-US"
+    style="word-wrap: break-word; padding-bottom: 0px; overflow: visible"
+  >
+    <div id="content">
+      <div>
+        <div
+          class="MsoNormalTable"
+          style="
+            margin-left: 0.9pt;
+            border-collapse: collapse;
+            border-right: 1px solid black;
+          "
+        >
+          <div style="size: a4">
+            <table style="width: 100%; color: black" [border]="1">
+              <tr>
+                <td style="padding: 16px">
+                  <div
+                    style="
+                      text-align: center;
+                      font-size: 18px;
+                      font-family: monospace;
+                      font-weight: 600;
+                      padding-bottom: 10px;
+                    "
+                  >
+                    Form - A : 1 (See Rule No. 3 B)
+                  </div>
+                  <div
+                    style="
+                      text-align: center;
+                      font-size: 12px;
+                      font-family: monospace;
+                      font-weight: 600;
+                      padding-bottom: 10px;
+                    "
+                  >
+                    Labour Welfare Fund Register As On
+                  </div>
+                  <div
+                    style="
+                      text-align: center;
+                      font-size: 12px;
+                      font-family: monospace;
+                      padding-bottom: 10px;
+                    "
+                  >
+                    {{ lastDate }}
+                  </div>
+                  <div style="padding: 10px 0; font-size: 12px">
+                    Account No. :-
+                    <span
+                      style="
+                        font-weight: 600;
+                        margin-left: 20px;
+                        font-size: 12px;
+                      "
+                    >
+                      {{ branchPTnumberIDs }}
+                    </span>
+                    <span
+                      style="
+                        font-weight: 600;
+                        margin-left: 20px;
+                        font-size: 12px;
+                      "
+                    ></span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 20px">
+                  <div style="display: flex">
+                    <div style="flex: 1; font-size: 12px; font-weight: 500">
+                      <span>1. Name Of The Factory/Establishment</span>
+                    </div>
+                    <div style="flex: 1; font-weight: 600">
+                      {{#if isBranch }}
+                      <span style="font-size: 12px">
+                        {{ companyAddress.companyName }} ({{
+                        branchAddress.branchName }})
+                      </span>
+                      {{else}}
+                      <span style="font-size: 12px">
+                        {{ companyAddress.companyName }}
+                      </span>
+                      {{/if}}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 20px">
+                  <div style="display: flex">
+                    <span style="flex: 1; font-size: 12px; font-weight: 500">
+                      2. Name Of Owner :
+                    </span>
+                    <span style="flex: 1"></span>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 20px">
+                  <div style="display: flex">
+                    <div style="flex: 1; font-size: 12px; font-weight: 500">
+                      <span>3. Nature of Factory/Establisment :</span>
+                    </div>
+                    <div style="flex: 1">
+                      <span></span>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 20px">
+                  <div style="display: flex">
+                    <span style="flex: 1; font-size: 12px; font-weight: 500">
+                      4. Address Of Factory/Establisment :
+                    </span>
+                    {{#if isBranch}}
+                    <span style="flex: 1; font-weight: 600; font-size: 12px">
+                      {{ branchAddress.branchAddress }}
+                    </span>
+                    {{else}}
+                    <span style="flex: 1; font-weight: 600; font-size: 12px">
+                      {{ companyAddress.companyAddress }}
+                    </span>
+                    {{/if}}
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 20px">
+                  <div class="row1">
+                    <div
+                      class="col-md1-5"
+                      style="font-size: 12px; font-weight: 500"
+                    >
+                      <span>5. Total No. Of Workers on Firm</span>
+                    </div>
+                    <div class="col-md1-7">
+                      <span style="font-size: 12px; font-weight: 500">
+                        {{ totalemployeedataUserside }}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 20px">
+                  <div style="display: flex">
+                    <div style="flex: 1; font-size: 12px; font-weight: 500">
+                      <span>Register As On</span>
+                    </div>
+                    <div style="flex: 1">
+                      <span style="font-size: 12px; font-weight: 500">
+                        {{ lastDate }}</span
+                      >
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 20px">
+                  <div class="row1">
+                    <span
+                      class="col-md1-5"
+                      style="
+                        font-size: 12px;
+                        font-weight: 500;
+                        padding-bottom: 10px;
+                      "
+                    >
+                      <span>6.</span>
+                      &nbsp;(a) Workers Share As per Column # 5
+                    </span>
+                    <span
+                      class="col-md1-7"
+                      style="font-size: 12px; font-weight: 500"
+                    >
+                      {{ totalemployeedataUserside }}
+                    </span>
+                  </div>
+
+                  <div class="row1">
+                    <span
+                      class="col-md1-5"
+                      style="
+                        font-size: 12px;
+                        font-weight: 500;
+                        padding-bottom: 10px;
+                      "
+                    >
+                      <span style="visibility: hidden">6.&nbsp;(a)</span>
+                      6.00 Rs Per Worker
+                    </span>
+                    <span class="col-md1-7"></span>
+                  </div>
+
+                  <div class="row1">
+                    <span
+                      class="col-md1-5"
+                      style="
+                        font-size: 12px;
+                        font-weight: 500;
+                        padding-bottom: 10px;
+                      "
+                    >
+                      <span style="visibility: hidden">6.</span>
+                      &nbsp;(b) Owners Share As per Column # 5
+                    </span>
+                    <span
+                      class="col-md1-7"
+                      style="font-size: 12px; font-weight: 500"
+                    >
+                      {{ totalemployeedataCompanyside }}
+                    </span>
+                  </div>
+
+                  <div class="row1">
+                    <span
+                      class="col-md1-5"
+                      style="
+                        font-size: 12px;
+                        font-weight: 500;
+                        padding-bottom: 10px;
+                      "
+                    >
+                      <span style="visibility: hidden">6.&nbsp;(b)</span>
+                      12.00 Rupee Per Worker
+                    </span>
+                    <span class="col-md1-7"></span>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 20px">
+                  <div class="row1">
+                    <span
+                      class="col-md1-5"
+                      style="
+                        font-size: 12px;
+                        font-weight: 500;
+                        padding-bottom: 10px;
+                      "
+                    >
+                      <span>7.</span>
+                      &nbsp; (1) Details Of Fund paid to Welfare Commissinor
+                    </span>
+                    <span class="col-md1-7"></span>
+                  </div>
+
+                  <div class="row1">
+                    <span
+                      class="col-md1-5"
+                      style="
+                        font-size: 12px;
+                        font-weight: 500;
+                        padding-bottom: 10px;
+                      "
+                    >
+                      <span style="visibility: hidden">7.(1)</span>
+                      &nbsp; (a) No. Of Employees :
+                    </span>
+                    <span
+                      class="col-md1-7"
+                      style="font-size: 12px; font-weight: 500"
+                    >
+                      {{ totalemployeedataUserside }}
+                    </span>
+                  </div>
+
+                  <div class="row1">
+                    <span
+                      class="col-md1-5"
+                      style="
+                        font-size: 12px;
+                        font-weight: 500;
+                        padding-bottom: 10px;
+                      "
+                    >
+                      <span style="visibility: hidden">7.(1)&nbsp; (a)</span>
+                      &nbsp; Employee's Share :
+                    </span>
+                    <span
+                      class="col-md1-7"
+                      style="font-size: 12px; font-weight: 500"
+                    >
+                      {{ totalemployeedataUserside }}
+                    </span>
+                  </div>
+
+                  <div class="row1">
+                    <span
+                      class="col-md1-5"
+                      style="
+                        font-size: 12px;
+                        font-weight: 500;
+                        padding-bottom: 10px;
+                      "
+                    >
+                      <span style="visibility: hidden">7.(1)</span>
+                      &nbsp; (b) Employeer's Share :
+                    </span>
+                    <span
+                      class="col-md1-7"
+                      style="font-size: 12px; font-weight: 500"
+                    >
+                      {{ totalemployeedataCompanyside }}
+                    </span>
+                  </div>
+
+                  <div class="row1">
+                    <span
+                      class="col-md1-5"
+                      style="
+                        font-size: 12px;
+                        font-weight: 500;
+                        padding-bottom: 10px;
+                      "
+                    >
+                      <span style="visibility: hidden">7.(1)&nbsp; (a)</span>
+                      &nbsp; T O T A L
+                    </span>
+                    <span
+                      class="col-md1-7"
+                      style="font-size: 12px; font-weight: 500"
+                    >
+                    </span>
+                  </div>
+
+                  <div class="row1">
+                    <span
+                      class="col-md1-5"
+                      style="
+                        font-size: 12px;
+                        font-weight: 500;
+                        padding-bottom: 10px;
+                      "
+                    >
+                      <span style="visibility: hidden">7.(1)</span>
+                      &nbsp; (c) Date Of Payment :
+                    </span>
+                    <span class="col-md1-7"></span>
+                  </div>
+
+                  <div class="row1">
+                    <span
+                      class="col-md1-5"
+                      style="
+                        font-size: 12px;
+                        font-weight: 500;
+                        padding-bottom: 10px;
+                      "
+                    >
+                      <span style="visibility: hidden">7.(1)</span>
+                      &nbsp; (d) Mode Of Payment :
+                    </span>
+                    <span class="col-md1-7"></span>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 20px">
+                  <div class="row1">
+                    <span
+                      class="col-md1-5"
+                      style="font-size: 12px; font-weight: 500"
+                    >
+                      8. Reasons for Less Payment or Unpaid:
+                    </span>
+                    <span class="col-md1-7"></span>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 20px">
+                  <div style="display: flex">
+                    <span
+                      style="
+                        flex: 1;
+                        font-size: 12px;
+                        font-weight: 500;
+                        text-align: left;
+                      "
+                    >
+                      Date :
+                    </span>
+                    {{#if isBranch }}
+                    <span style="font-size: 12px">
+                      {{ companyAddress.companyName }}({{
+                      branchAddress.branchName }})
+                    </span>
+                    {{else}}
+                    <span style="font-size: 12px">
+                      {{ companyAddress.companyName }}
+                    </span>
+                    {{/if}}
+                  </div>
+
+                  <div style="display: flex">
+                    <span
+                      style="
+                        flex: 2;
+                        font-size: 12px;
+                        font-weight: 500;
+                        text-align: right;
+                        padding-top: 80px;
+                      "
+                    >
+                      AUTHORIZE SIGNATURE
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

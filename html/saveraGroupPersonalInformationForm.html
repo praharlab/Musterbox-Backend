@@ -1,0 +1,144 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <title>
+        Personal Information Form
+    </title>
+    <style>
+        * {
+            font-family: "Noto Sans Devanagari", serif;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+            padding: 10px;
+        }
+
+        .emptyBlock {
+            min-width: 150px;
+        }
+
+        .fs24 {
+            font-size: 1.5rem;
+        }
+
+        .p20 {
+            padding: 20px;
+        }
+
+        .fnormal {
+            font-weight: normal;
+        }
+
+        .container {
+            margin: auto;
+            max-width: 880px;
+            margin-top: 50px;
+        }
+
+        .m-auto {
+            margin: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <table class="m-auto">
+            <thead>
+                <tr>
+                    <th colspan="3">
+                        <p class="text-right"><span class="fnormal">Date Of Joining:</span> {{userDateOfJoining}}</p>
+                        <p class="fs24">{{usersContractorName}}</p>
+                        <p class="fnormal">{{usersContractorAddress}}</p>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="3" class="text-center">
+                        <b> *PERSONAL INFORMATION FORM* <br> (वैयक्तिक माहिती फॉर्म) </b>
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>1) APPLICANTS FULL NAME : <br> (अर्जदारांचे पूर्ण नाव)</b></td>
+                    <td>{{userName}}</td>
+                    <td rowspan="6" class="emptyBlock">
+                        <div>
+                            {{#if userPhotoURL}}
+                            <img style="height: 200px; width: 150px;" src="{{userPhotoURL}}">
+                            {{/if}}
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>2) DATE OF BIRTH : <br> (जन्मतारीख)</b></td>
+                    <td>{{userDateOfBirth}}</td>
+                </tr>
+                <tr>
+                    <td><b>3) DATE OF JOINING : <br> (सामील होण्याची तारीख) </b></td>
+                    <td>{{userDateOfJoining}}</td>
+                </tr>
+                <tr>
+                    <td><b>4) GENDER : (लिंग) </b></td>
+                    <td>{{userGender}}</td>
+                </tr>
+                <tr>
+                    <td><b>5) DEPARTMENT : (विभाग) </b></td>
+                    <td>{{userDepartment}}</td>
+                </tr>
+                <tr>
+                    <td><b>6) PUNCHING CARD NUMBER : <br> (पंचिंग कार्ड क्रमांक) {{userBiometricCode}}</b></td>
+                    <td><b>AADHAR NUMBER : <br> (आधार क्रमांक) </b> {{userAdharCardNumber}}</td>
+                </tr>
+                <tr>
+                    <td><b>7) DESIGNATION : (पदनाम) </b></td>
+                    <td colspan="2"> {{userDesignation}}
+                        <!-- ({{marathiUserDesignation}}) -->
+                        {{userSkillCategory}}
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>7) CURRENT ADDRESS : <br>(चालू पत्ता) </b></td>
+                    <td colspan="2">{{userCurrentAddress}} <br> {{userCurrentAddressMarathi}}</td>
+                </tr>
+                <tr>
+                    <td><b>9) PERMANENT ADDRESS : <br> (कायमचा पत्ता) </b></td>
+                    <td colspan="2">{{userPermanentAddress}} <br> {{userPermanentAddressMarathi}}</td>
+                </tr>
+                <tr>
+                    <td><b>10) FATHERS/ MOTHERS/ SPOUSE NAME : <br> (वडील / आई / जोडीदाराचे नाव) </b></td>
+                    <td colspan="2">{{userFatherName}}</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="text-right p20">
+                        <br>
+                        <br>
+                        <b>Yours Faithfully <br> (तुमचा विश्वासू) </b>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>

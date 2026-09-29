@@ -1,0 +1,306 @@
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="./bootstrap.css" />
+  <title>Book Face</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      font-family: 'Nunito', sans-serif;
+      letter-spacing: 0.3px;
+      font-size: 10px;
+    }
+
+    .container {
+      width: 305px !important;
+      height: 473px !important;
+    }
+
+    .background {
+      position: relative;
+      background-size: cover;
+      background-image: url('{{this.appURL}}assets/ecardbgfinal.png');
+      height: 482px;
+      background-size: 305px 482px;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    td {
+      font-size: 10px;
+    }
+
+    .companyLogo {
+      -o-object-fit: content;
+      object-fit: content;
+      background: transparent;
+      border-radius: 15px;
+      width: auto;
+      height: 50px !important;
+      mix-blend-mode: darken;
+    }
+
+    .profile-pic {
+      height: 130px;
+      width: 130px !important;
+      border-radius: 15px;
+      /* -o-object-fit: content; */
+      /* object-fit: content; */
+      min-width: 130px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #ffffff;
+      color: #000000;
+      font-size: 32px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .p10 {
+      padding: 10px;
+    }
+
+    .mt10 {
+      margin-top: 10px;
+    }
+
+    .mt5 {
+      margin-top: 5px;
+    }
+
+    .d-flex {
+      display: flex;
+    }
+
+    .justify-content-between {
+      justify-content: space-between;
+    }
+
+    .justify-content-center {
+      justify-content: center;
+    }
+
+    .justify-content-around {
+      justify-content: space-around;
+    }
+
+    .fs12 {
+      font-size: 12px !important;
+    }
+
+    .fs14 {
+      font-size: 14px !important;
+    }
+
+    .fw800 {
+      font-weight: 800
+    }
+
+    .signatureImage {
+      min-height: 40px;
+      min-width: 100px;
+      height: 40px;
+      width: 100px;
+      background: transparent;
+      mix-blend-mode: darken !important;
+    }
+
+    .table {
+      padding: 10px 10px 20px 20px;
+    }
+
+    .top-bottom {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .footer-signature {
+      position: absolute;
+      width: 100%;
+      bottom: 0px;
+      left: 0px;
+    }
+
+    .manageAddress {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+
+    .w-fit {
+      min-width: fit-content !important;
+    }
+
+    .white-space-no-wrap {
+      white-space: nowrap !important;
+    }
+
+    .pb5 {
+      padding-bottom: 10px;
+    }
+
+    .pl5 {
+      padding-left: 20px;
+    }
+  </style>
+</head>
+
+<body class="fix-height">
+  <div class="fix-height" #screen>
+    {{#each tempData}}
+    <div class="container col-4">
+      <div class="">
+        <div class="background">
+          <div class="top-bottom p10">
+            {{#if this.idCardData.employeeCode}}
+            <div class="text-right">
+              <span>
+                <b>{{ this.idCardData.employeeCode }}</b>
+              </span>
+            </div>
+            {{/if}} {{#if this.idCardData.companyLogo}}
+            <div class="text-center d-flex justify-content-center">
+              <img class="companyLogo" src="{{this.ApiURL}}uploads/company/logo/{{ this.idCardData.companyLogo }}" />
+            </div>
+            {{else}}
+            <div>
+              <div class="companyLogo"></div>
+              <!-- <div class="companyLogo">{{this.idCardData.profilePicName}}</div> -->
+            </div>
+            {{/if}} {{#if this.idCardData.companyNameLength}}
+            <div class="text-center">
+              <span>
+                <b class="fs12 p10">{{ this.idCardData.companyName }}</b>
+              </span>
+            </div>
+            {{else}}
+            <div class="text-center">
+              <span class="">
+                <b class="fs14">{{ this.idCardData.companyName }}</b>
+              </span>
+            </div>
+            {{/if}}
+            <div class="d-flex justify-content-center align-items-center mt5">
+              {{#if this.idCardData.userPhoto}}
+              <img class="profile-pic" src="{{this.ApiURL}}uploads/user/photo/{{ this.idCardData.userPhoto }}" alt="" />
+              {{else}}
+              <div class="profile-pic">
+                {{this.idCardData.profilePicName}}
+              </div>
+              {{/if}}
+            </div>
+            <div>
+              <div class="mt5">
+                <p class="text-center fs12">
+                  <b class="fs12"> {{ this.idCardData.userDisplayName }} </b>
+                </p>
+              </div>
+              <div class="text-center">
+                {{#if this.idCardData.designationName}}
+                <p class="fs12">
+                  {{ this.idCardData.designationName }}
+                </p>
+                {{/if}}
+                {{#if this.idCardData.branchName}}
+                <p class="fs12">
+                  {{ this.idCardData.branchName }}
+                </p>
+                {{/if}}
+              </div>
+              <div>
+                <table class="table">
+                  <tr>
+                    <td class="w-fit white-space-no-wrap"><span><b>Mobile No</b></span></td>
+                    <td>&nbsp;:&nbsp;&nbsp;&nbsp;</td>
+                    <td> {{ this.idCardData.userNumber }} </td>
+                  </tr>
+                  <tr>
+                    <td class="w-fit white-space-no-wrap"><span><b>Date Of Joining</b></span></td>
+                    <td>&nbsp;:&nbsp;&nbsp;&nbsp;</td>
+                    <td> {{ this.idCardData.joiningDate }} </td>
+                  </tr>
+                  <tr>
+                    <td class="w-fit white-space-no-wrap"><span><b>Date Of Birth</b></span></td>
+                    <td>&nbsp;:&nbsp;&nbsp;&nbsp;</td>
+                    <td> {{ this.idCardData.dob }} </td>
+                  </tr>
+                  <tr>
+                    <td class="w-fit white-space-no-wrap"><span><b>Blood Group</b></span></td>
+                    <td>&nbsp;:&nbsp;&nbsp;&nbsp;</td>
+                    <td> {{ this.idCardData.bloodgroup }} </td>
+                  </tr>
+                  <tr>
+                    <td class="w-fit white-space-no-wrap"><span><b>Address</b></span></td>
+                    <td>&nbsp;:&nbsp;&nbsp;&nbsp;</td>
+                    <td class="manageAddress">
+                      {{#if this.idCardData.houseNumber}}
+                      <span> {{ this.idCardData.houseNumber }}, </span>
+                      {{/if}} {{#if this.idCardData.houseName}}
+                      <span> {{ this.idCardData.houseName }}, </span>
+                      {{/if}} {{#if this.idCardData.landmark}}
+                      <span> {{ this.idCardData.landmark }}, </span>
+                      {{/if}} {{#if this.idCardData.cityName}}
+                      <span>{{ this.idCardData.cityName }} </span>
+                      {{/if}} {{#if this.idCardData.zipcode}}
+                      <span> -{{ this.idCardData.zipcode }} </span>
+                      {{/if}}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="w-fit white-space-no-wrap"><span><b>Company Address</b></span></td>
+                    <td>&nbsp;:&nbsp;&nbsp;&nbsp;</td>
+                    <td class="manageAddress"> {{ this.idCardData.companyAddress }} </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-around footer-signature">
+            <div class="pb5 pl5">
+              {{#if this.idCardData.userSignature}}
+              <img class="signatureImage" src="{{this.ApiURL}}uploads/user/signature/{{this.idCardData.userSignature}}"
+                alt="" />
+              <div class="mt5">
+                <span class="fw800">Employee Signature</span>
+              </div>
+              {{/if}}
+            </div>
+            <div class="pb5 pl5">
+              {{#if this.idCardData.authorizedSignature}}
+              <img class="signatureImage"
+                src="{{this.ApiURL}}uploads/company/signature/{{this.idCardData.authorizedSignature}}" alt="" />
+              {{else}}
+              <div class="signatureImage"></div>
+              {{/if}}
+              <div class="mt5">
+                <span class="fw800">Authorized Signature</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+
+  <script src="./bootstrap.js"></script>
+  <script src="./jquery.js"></script>
+  <script src="./popper.js"></script>
+</body>
+
+</html>

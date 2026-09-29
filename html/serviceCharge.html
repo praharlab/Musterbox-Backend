@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Charges Bill</title>
+    <style>
+        * {
+            margin: 0px;
+            padding: 0px;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 8px;
+        }
+
+        .container {
+            margin: 20px auto !important;
+            max-width: 700px;
+            margin: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+            padding: 3px 5px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .p0 {
+            padding: 0px !important;
+        }
+
+        .mt5 {
+            margin-top: 5px;
+        }
+
+        .w50 {
+            width: 50%;
+        }
+
+        .wfit {
+            width: fit-content;
+        }
+
+        .fs10 {
+            font-size: 10px;
+        }
+
+        .fs16 {
+            font-size: 12px;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        @media print {
+            @page {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        {{#each finalData}}
+        <div class="page-break">
+            <table>
+                <tbody>
+                    <tr>
+                        <td class="p0">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th colspan="2" class="fs16">
+                                            GSX TAX INVOICE - SERVICE CHARGES
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="2" class="text-center">
+                                            &nbsp;
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="text-center fs10">
+                                            <b>{{contractorName}}</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="text-center">
+                                            {{#if contractorAddress}}
+                                                {{contractorAddress}}
+                                            {{else}}
+                                                &nbsp;
+                                            {{/if}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="text-center">
+                                            &nbsp;
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w50">
+                                            GSTIN No :{{contractorgstNumber}}
+                                        </td>
+                                        <td class="w50">
+                                            Reverse Charge :- Y/N
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w50">
+                                            Invoice No :
+                                        </td>
+                                        <td class="w50">
+                                            Original for Receipent [ ]
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w50">
+                                            Invoice Date :
+                                        </td>
+                                        <td class="w50">
+                                            Duplicate for Transporter [ ]
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w50">
+                                            Date of Supply :
+                                        </td>
+                                        <td class="w50">
+                                            Triplicate for Supplier [ ]
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w50">
+                                            <b>Bill For The Month of : {{month}}</b>
+                                        </td>
+                                        <td class="w50">
+                                            E way Bill No.:-
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="text-center">
+                                            &nbsp;
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <b>Details of Receiver / Consignee | Billed To /Shipped To</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Company Name:
+                                        </td>
+                                        <td>
+                                            {{companyName}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Company Address:
+                                        </td>
+                                        <td>
+                                            {{companyAddress}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            GSTIN No.:
+                                        </td>
+                                        <td>
+                                            {{companygstNumber}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            State Name With Code:
+                                        </td>
+                                        <td>
+                                            &nbsp;
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="p0">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td class="wfit">
+                                            Sr.No
+                                        </td>
+                                        <td>
+                                            Name of Service
+                                        </td>
+                                        <td>
+                                            HSN Code
+                                        </td>
+                                        <td>
+                                            Qty(Man Days)
+                                        </td>
+                                        <td>
+                                            Rate(GROSS)
+                                        </td>
+                                        <td>
+                                            Amonut(Rs.)
+                                        </td>
+                                    </tr>
+                                    {{#each serviceChargesArray}}
+                                        <tr>
+                                        <td>
+                                           {{this.srno}} 
+                                        </td>
+                                        <td>
+                                            <b>SERVICE CHARGES ({{this.from}} - {{this.to}} Days)</b>
+                                        </td>
+                                        <td>
+                                            <b>{{this.HSNCode}}</b>
+                                        </td>
+                                        <td class="text-center">
+                                            &nbsp;
+                                        </td>
+                                        <td class="text-center">
+                                            &nbsp;
+                                        </td>
+                                        <td class="text-center">
+                                            &nbsp;
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            &nbsp;
+                                        </td>
+                                        <td>
+                                            <b>
+                                                &nbsp;(i) Skilled
+                                            </b>
+                                        </td>
+                                        <td>
+                                           
+                                        </td>
+                                        <td class="text-center">
+                                           {{this.skilledQty}}
+                                        </td>
+                                        <td class="text-center">
+                                            {{this.skilledRate}}
+                                        </td>
+                                        <td class="text-center">
+                                            {{this.skilledAmount}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            &nbsp;
+                                        </td>
+                                        <td>
+                                            <b>
+                                                (ii) Semiskilled
+                                            </b>
+                                        </td>
+                                        <td>
+                                            &nbsp;
+                                        </td>
+                                        <td class="text-center">
+                                           {{this.semiskilledQty}}
+                                        </td>
+                                        <td class="text-center">
+                                          {{this.semiskilledRate}}
+                                        </td>
+                                        <td class="text-center">
+                                           {{this.semiskilledAmount}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            &nbsp;
+                                        </td>
+                                        <td>
+                                            <b>
+                                                (iii) Unskilled
+                                            </b>
+                                        </td>
+                                        <td>
+                                            &nbsp;
+                                        </td>
+                                        <td class="text-center">
+                                            {{this.unskilledQty}}
+                                        </td>
+                                        <td class="text-center">
+                                           {{this.unskilledRate}}
+                                        </td>
+                                        <td class="text-center">
+                                           {{this.unskilledAmount}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            &nbsp;
+                                        </td>
+                                        <td>
+                                            <b>Total</b>
+                                        </td>
+                                        <td>
+                                            &nbsp;
+                                        </td>
+                                        <td class="text-center">
+                                            &nbsp;
+                                        </td>
+                                        <td class="text-center">
+                                            &nbsp;
+                                        </td>
+                                        <td class="text-center">
+                                            <b>{{this.Total}}</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="6">
+                                            &nbsp;
+                                        </td>
+                                    </tr>
+                                    {{/each}}
+                             
+                                    <tr>
+                                        <td colspan="6">
+                                            &nbsp;
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <b>TOTAL Amount Before Tax</b>
+                                        </td>
+                                        <td class="text-center">
+                                            Rs.
+                                        </td>
+                                        <td class="text-center">
+                                            <b>{{Total_Amount_Before_Tax}}</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">
+                                            &nbsp;
+                                        </td>
+                                        <td>
+                                            SGST
+                                        </td>
+                                        <td class="text-center">
+                                            9%
+                                        </td>
+                                        <td class="text-center">
+                                            <b>{{SGST}}</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">
+                                            &nbsp;
+                                        </td>
+                                        <td>
+                                            CGST
+                                        </td>
+                                        <td class="text-center">
+                                            9%
+                                        </td>
+                                        <td class="text-center">
+                                            <b>{{CGST}}</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            &nbsp;
+                                        </td>
+                                        <td class="text-right">
+                                            Total GST Amount
+                                        </td>
+                                        <td class="text-center">
+                                            <b>{{Toal_Tax}}</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="6">
+                                            &nbsp;
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <b>TOTAL Amount After Tax</b>
+                                        </td>
+                                        <td class="text-center">
+                                            Rs.
+                                        </td>
+                                        <td class="text-center">
+                                            <b>{{Total_Amount_After_Tax}}</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="6">
+                                            <b>TOTAL Amount in words:- {{In_Words}}
+                                                </b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">
+                                            Receiver Sign
+                                        </td>
+                                        <td colspan="3">
+                                            <div>
+                                                <p>
+                                                    <b>For {{contractorName}}</b>
+                                                </p>
+                                                <br>
+                                                <br>
+                                                <br>
+                                                <br>
+                                                <br>
+                                                <p>
+                                                    <b>Authorised Signatory</b>
+                                                </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="mt5">
+                <b>Note :- Service charge to be paid separately after process of the distribution of wages to respective
+                    workers along with all applicable contribution is completed &
+                    acknowledgement is submitted to the responsible person.</b>
+            </p>
+
+        </div>
+        {{/each}}
+    </div>
+</body>
+
+</html>

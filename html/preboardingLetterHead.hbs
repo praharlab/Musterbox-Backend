@@ -1,0 +1,34 @@
+<div
+  style='position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 150px;
+            background-color: lightgray;
+            display: flex;
+            justify-content: center;
+            align-items: center;'
+>
+  <div
+    style="width: 90%; text-align: center; font-family:  'Times New Roman', Times, serif;"
+  >
+    <div>
+      <img
+        class='logo'
+        style='max-height: 80px;max-width: 200px;margin-top:3%'
+        src='{{base64}}'
+        alt='Company Logo'
+      />
+    </div>
+    <div style='font-size: 22px; margin-top: 5px;'>{{companyName}}</div>
+    <div style='font-size: 12px;'>{{companyAddress}}</div>
+    <div
+      style='border-bottom: solid thin; padding-bottom: 10px; font-size: 12px;'
+    >
+      <b>Contact:</b>
+      {{cpMobileNo}}
+      &nbsp;&nbsp;<b>Email:</b>{{companyEmail}}
+      &nbsp;&nbsp;{{companyWebsite}}
+    </div>
+  </div>
+</div>

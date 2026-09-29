@@ -1,0 +1,156 @@
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <title>Checksheet Coversheet of Recruitment Documents</title>
+    <style>
+        * {
+            font-family: "Noto Sans Devanagari", serif;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        table {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        td,
+        th {
+            border: 1px solid black;
+            text-align: left;
+            padding: 10px;
+        }
+
+        .m5 {
+            margin: 5px !important;
+        }
+
+        .fs24 {
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th colspan="4">
+                    <p class="text-right m5"><b>Date Of Joining : {{userDateOfJoining}}</b></p>
+                    <p class="text-center fs24"><b>Checksheet Coversheet of Recruitment Documents <br> (भर्ती
+                            कागदपत्रांची चेकशीट कव्हरशीट) </b></p>
+                </th>
+            </tr>
+            <tr>
+                <th><b>SL No</b></th>
+                <th><b>DOCUMENTS DETAILS (दस्तऐवज तपशील)</b></th>
+                <th><b>CATEGORY (वर्ग)</b></th>
+                <th><b>AVAILABILITY (उपलब्धता)</b></th>
+                <th><b>REMARKS (टिप्पणी)</b></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>Personal Information (वैयक्तिक माहिती)</td>
+                <td>Must (आवश्यक)</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Age Proof (वयाचा पुरावा)</td>
+                <td>Must (आवश्यक)</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Educational Certificates (शैक्षणिक प्रमाणपत्रे) (If Any)</td>
+                <td>Optional (ऐच्छिक)</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Appointment Letter (नियुक्ती पत्र) / Agreement (करार)</td>
+                <td>Must (आवश्यक)</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Salary Structure (पगाराची रचना)</td>
+                <td>Must (आवश्यक)</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>New Joinee Induction Training (नवीन जॉइनी इंडक्शन प्रशिक्षण)</td>
+                <td>Must (आवश्यक)</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>Two Passport Size Photos (दोन पासपोर्ट आकाराचे फोटो)</td>
+                <td>Must (आवश्यक)</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><span>Note</span>&nbsp;<span>:</span></td>
+                <td colspan="4">
+                    <p>
+                        1. MUST CATEGORY DOCUMENTS ARE MANDATORY DURING OPENING FILE EXCEPTS ESIC & PF. THE SAME TO BE
+                        ADDED IN PERSONAL FILE AS PER LAW. <br> (ईएसआयसी आणि पीएफ वगळता फाइल उघडताना वर्गवारीची
+                        कागदपत्रे अनिवार्य आहेत. कायद्यानुसार वैयक्तिक फाइलमध्ये तेच जोडले पाहिजे.)
+                    </p>
+                    <P>
+                        2. ESIC NO, PF NO & NOMINEE NAME TO BE UPDATED IN SYSTEM AS PER LABOUR LAW & LABOUR FORCE
+                        REGISTER WILL BE UPDATED ACCORDINGLY & RECORD TO BE KEPT SEPARETELY. (कामगार कायद्यानुसार
+                        प्रणालीमध्ये अद्ययावत केले जाणारे ईएसआयसी क्रमांक, पीएफ क्रमांक आणि नॉमिनीचे नाव आणि कामगार दल
+                        नोंदणी त्यानुसार अद्ययावत केली जाईल आणि रेकॉर्ड स्वतंत्रपणे ठेवली जाईल.)
+                    </P>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">ALLOTED EMPLOYEE CODE NO: (वाटप केलेला कर्मचारी कोड क्रमांक:) <b>
+                        {{userEmployeeCode}}</b></td>
+                <td colspan="3">SIGN OF EMPLOYEE: (कर्मचारी स्वाक्षरी) </td>
+            </tr>
+            <tr>
+                <td colspan="5">
+                    DOCUMENTS VERIFIED & PUNCHING NO. ISSUED BY(SIGN & NAME): <br>(कागदपत्रे सत्यापित आणि पंचिंग क्र.
+                    द्वारे जारी केलेले (स्वाक्षरी आणि नाव))
+                </td>
+            </tr>
+            <tr>
+                <td colspan="5">
+                    INTERNAL AUDIT BY(SIGN & NAME): (अंतर्गत ऑडिट (स्वाक्षरी आणि नाव))
+                </td>
+            </tr>
+            <tr>
+                <td colspan="5">
+                    Format No: HR/F/02: Rev : 1, Dtd.01/03/25
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>

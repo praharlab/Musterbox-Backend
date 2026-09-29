@@ -1,0 +1,253 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./bootstrap.css" />
+  <title>Salary register With Date Of Pay</title>
+  <style>
+    body {
+      margin: 20px !important;
+      font-family: Arial, sans-serif !important;
+    }
+
+    */ .table {
+      page-break-inside: auto;
+    }
+
+    .table tr {
+      page-break-inside: avoid;
+    }
+
+    .table td {
+      page-break-inside: avoid;
+    }
+
+    tr {
+      page-break-inside: avoid !important;
+    }
+
+    th {
+      font-size: 8px;
+      padding-top: 2px;
+      padding-bottom: 2px;
+      text-wrap: wrap;
+      white-space: wrap;
+      line-height: 10px;
+    }
+
+    td {
+      padding-top: 2px;
+      padding-bottom: 2px;
+      font-size: 8px;
+      text-wrap: wrap;
+      white-space: wrap;
+    }
+
+    .vertical-text {
+      writing-mode: vertical-lr;
+    }
+
+    @media print {
+      thead {
+        display: table-header-group;
+      }
+
+      @page {
+        margin: 20px 5px !important;
+      }
+    }
+
+    .cell1 {
+      text-align: center;
+      width: 24px !important;
+    }
+
+    .cell2 {
+      text-align: left;
+      width: 171px !important;
+    }
+
+    .cell3 {
+      text-align-last: justify;
+      width: 114px !important;
+    }
+
+    .cell4 {
+      text-align-last: justify;
+      width: 147px !important;
+    }
+
+    .cell5 {
+      text-align-last: justify;
+      width: 147px !important;
+    }
+
+    .cell6 {
+      text-align-last: justify;
+      width: 136px !important;
+    }
+
+    .cell7 {
+      text-align: center;
+      width: 69px !important;
+    }
+
+    .cell8 {
+      text-align: center;
+      width: 68px !important;
+    }
+
+    .cell9 {
+      text-align: center;
+      width: 68px !important;
+    }
+
+    .cell {
+      white-space: pre-line !important;
+      padding: 5px;
+      border: 1px solid rgb(189, 189, 189);
+    }
+
+    .thCell {
+      line-height: 15px;
+      padding: 5px;
+      text-align: left;
+      border: 1px solid rgb(189, 189, 189);
+    }
+
+    .thCell1 {
+      text-align: center !important;
+      width: 24px !important;
+    }
+
+    .thCell2 {
+      width: 171px !important;
+    }
+
+    .thCell3 {
+      width: 114px !important;
+    }
+
+    .thCell4 {
+      width: 147px !important;
+    }
+
+    .thCell5 {
+      width: 147px !important;
+    }
+
+    .thCell6 {
+      width: 136px !important;
+    }
+
+    .thCell7 {
+      width: 69px !important;
+    }
+
+    .thCell8 {
+      width: 68px !important;
+    }
+
+    .thCell9 {
+      width: 68px !important;
+    }
+
+    .last-row {
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+  <table style="width: 100%; border: hidden" border="0">
+    <tr style="vertical-align: top">
+      <td style="width: 50%">
+        <div style="
+              text-align: left;
+              font-size: 16px;
+              font-weight: 400;
+              margin-bottom: 5px;
+            ">
+          {{companyName}}
+        </div>
+        <div style="text-align: left; font-size: 12px !important">
+          {{branchAddress}}
+        </div>
+      </td>
+      <td style="font-size: 12px; width: 50%">
+        <div style="margin-bottom: 3px">
+          (1) Form under Rule-6 of Equal Remuneration Rules 1976.
+        </div>
+        <div style="margin-bottom: 3px">
+          (2) Form under Rule-2(4),25(2),26(1) and 26(2) of Gujarat Minimum
+          Wages Rules 1961
+        </div>
+        <div style="margin-bottom: 3px">
+          (3) Form under Rule-6 of Payment of Wages Gujarat Rules. 1963.
+        </div>
+        <div style="margin-bottom: 3px">
+          (4) Form 17 under Rule-78 of Contract Labour (Regulation &
+          Abolition) Gujarat Rules.1972
+        </div>
+        <div>
+          (5) Form under Rule-52(2)of Inter State Migrant Workers (Gujarat)
+          Rules 1981.
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <table style="width: 100%; border: hidden" border="0">
+    <tr>
+      <td style="font-size: 12px">PF No&nbsp;:- {{pfNumber}}</td>
+    </tr>
+    <tr>
+      <td style="font-size: 12px">ESI No&nbsp;:- {{esicNumber}}</td>
+      <td style="font-size: 12px; text-align: end">
+        Date of Payment&nbsp;:-
+      </td>
+      <td style="font-size: 12px; text-align: end">Wages/ Salary Register</td>
+      <td style="font-size: 12px; text-align: end">
+        For The Month Of {{yearmonth1}}
+      </td>
+    </tr>
+  </table>
+
+  <div style="margin-bottom: 20px">
+    <table border="1" style="
+          width: 100%;
+          border-collapse: collapse;
+          border: 1px solid rgb(189, 189, 189);
+        ">
+      <thead>
+        <tr>
+          {{#each headers}}
+          <th style="font-size: 12px; font-weight: 600"
+            class="thCell {{#if (eq @index 0)}} thCell1 {{/if}}{{#if (eq @index 1)}} thCell2 {{/if}}{{#if (eq @index 2)}} thCell3 {{/if}}{{#if (eq @index 3)}} thCell4 {{/if}}{{#if (eq @index 4)}} thCell5 {{/if}}{{#if (eq @index 5)}} thCell6 {{/if}}{{#if (eq @index 6)}} thCell7 {{/if}}{{#if (eq @index 7)}} thCell8 {{/if}}{{#if (eq @index 8)}} thCell9 {{/if}}">
+            {{this}}
+          </th>
+          {{/each}}
+        </tr>
+      </thead>
+      <tbody>
+        {{#each MainData}}
+        <tr class="{{#if @last}}last-row{{/if}}">
+          {{#each this}}
+          <td style="font-size: 12px"
+            class="cell {{#if (eq @index 0)}} cell1 {{/if}}{{#if (eq @index 1)}} cell2 {{/if}}{{#if (eq @index 2)}} cell3 {{/if}}{{#if (eq @index 3)}} cell4 {{/if}}{{#if (eq @index 4)}} cell5 {{/if}}{{#if (eq @index 5)}} cell6 {{/if}}{{#if (eq @index 6)}} cell7 {{/if}}{{#if (eq @index 7)}} cell8 {{/if}}{{#if (eq @index 8)}} cell9 {{/if}}">
+            {{this}}
+          </td>
+          {{/each}}
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+  <script src="./bootstrap.js"></script>
+  <script src="./jquery.js"></script>
+  <script src="./popper.js"></script>
+</body>
+
+</html>
